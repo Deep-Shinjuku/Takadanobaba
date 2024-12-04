@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高田馬場ファイターズ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.0/pixi.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        .inventory {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .inventory ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .inventory li {
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .inventory li:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .dialogue
+        {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 8px;
+            display: none;
+            .dialogue-character {
+                float: left;
+                margin-right: 10px;
+            }
+        }
+        .infobox {
+            display: flex;
+            flex-direction: row;
+            .infobox-modal {
+                flex: 1;
+                padding: 10px;
+                
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="inventory" id="inventory">
+        <!-- may remove in the future as it's not necessarily needed -->
+        <strong>Inventory:</strong>
+        <ul id="inventory-list"></ul>
+    </div>
+    <div class="inventory" style="display: none;">
+        <strong>Keys:</strong>
+        <ul id="inventory-list">
+            <li>[ WASD/Arrow ] 移動</li>
+            <li>[ Space ] 使用・打つ</li>
+            <li>[ I ] Inventory</li>
+            <!-- add more instructions later... should it always be visible? -->
+        </ul>
+        <strong>Directions:</strong>
+        <ul id="inventory-list">
+            <li>地図を探検して、ランドマークで高田馬場についてもっと知ろう</li>
+            <li>酔っ払ってるサラリーマン/動物園のネズミに打つ</li>
+            <li>アイテムを集めて高田馬場庇う！</li>
+        </ul>
+        
+    </div>
+    <div class="dialogue">
+        <!-- Dialogue box for interactions -->
+        <div class="dialogue-character">
+            <img />
+        </div>
+        <div class="dialogue-text">
+            <p>...</p>
+        </div>
+        <div class="infobox">
+            <div class="infobox-modal">
+
+            </div>
+        </div>
+    </div>
+    <script>
+        /*
+        TODO: Add bounding limits to the map so the player doesn't go off screen
+        TODO: Add attack and damage system for player and enemies
+        TODO: Expand map size so it's not just a small portion
+        TODO: Add more landmarks and enemies
+        TODO: Add contextual texture changes and animations for player and enemies
+        TODO: Disable object interaction after it's been interacted with
+        */
+        
+        const app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
+        console.log(app);
+        document.body.appendChild(app.view);
+        
+        // constants
+        const playerSpeed = 3;
+        const interactionRadius = 50;
+        const enemySpawnInterval = 20000;
+        const aggro_radius = 200;
+        
+        // Player state
+        const playerState = {
+            health: 100,
+            maxHealth: 100,
+            inventory: []
+        };
+        
+        class Player {
+
+            constructor(x=0, y=0, name='Player') {
+                this.id = Math.random().toString(36).substr(2, 9);
+                this.x = x;
+                this.y = y;
+                this.name = name;
+                this.sprite = new PIXI.Sprite(textures.player);
+                this.health = 100;
+                this.maxHealth = 100;
+                this.inventory = [];
+            }
+
+
+            // player = new PIXI.Sprite(textures.player);
+            // player.anchor.set(0.5);
+            // player.width = 64;
+            // player.height = 64;
+            
+            // player.x = app.screen.width / 2;
+            // player.y = app.screen.height / 2;
+            // player.zIndex = 2;
+            // player.scale.set(4);
+            // app.stage.addChild(player);
+
+
+
+            statistics = {
+                time_played: 0,
+                damage_dealt: 0,
+                damage_taken: 0,
+                enemies_killed: 0,
+                items_collected: 0,
+                items_used: 0,
+                landmarks_visited: 0,
+                special_events: 0
+            }
+            
+            heal(amount) {
+                this.health = Math.min(this.maxHealth, this.health + amount);
+            }
+            
+            addItem(item) {
+                this.inventory.push(item);
+            }
+            
+            useItem(index) {
+                const item = this.inventory[index];
+                
+                if (item.type === 'heal') {
+                    this.heal(item.value);
+                    console.log(`Used ${item.name}: Healed for ${item.value}. Current health: ${this.health}`);
+                } else if (item.type === 'special') {
+                    console.log(`Used ${item.name}: Effect - ${item.effect}`);
+                }
+                
+                // Remove item from inventory after use
+                this.inventory.splice(index, 1);
+            }
+            
+            // attack method
+            attack(target) {
+                let crit_chance = 10; // 10% chance to crit
+                let crit_damage = 2; // 2x damage on crit
+                let roll = Math.floor(Math.random() * 100 + 1);
+                let damage = 10; // default damage
+                // apply bonus if player has certain items in inventory
+                // if (this.inventory.some(item => item.name === 'Sword')) {
+                //     damage += 5;
+                // }
+
+                console.log(`Attacking target:`, target);
+                console.log(`Target class: ${target.constructor.name}`);
+                console.log(`Target has onHit: ${typeof target.onHit === 'function'}`);
+
+                if (roll <= crit_chance) {
+                    damage += Math.floor(Math.random() * 10 + 1) * crit_damage;
+                    target.onHit(damage);
+                    console.log(`Critical hit! Dealt ${damage} damage to ${target.name} (${target.uid})!`);
+                } else {
+                    target.onHit(damage);
+                    console.log(`Dealt ${damage} damage to ${target.name} (${target.uid})!`);
+                }
+            }
+        }
+
+        class NPC {
+            constructor(name, type, x, y) {
+                this.name = name;
+                this.type = type;
+                this.x = x;
+                this.y = y;
+                this.inventory = [];
+                this.sprite = new PIXI.Sprite(textures[type]);
+            }
+
+            addItem = (item) => {
+                this.inventory.push(item);
+            }
+
+            dialogue = () => {
+                // display dialogue
+                possibilities = [
+                    "よ！",
+                    "何かあるか？",
+                    "今日はいい天気だな",
+                    "お前、何者だ？",
+                    "高田馬場について知りたいか？",
+                    "高田馬場の歴史を知りたいか？",
+                    "高田馬場の名所を知りたいか？",
+                    "高田馬場の伝説を知りたいか？",
+                    "高田馬場の未来を知りたいか？",
+                    "高田馬場の秘密を知りたいか？",
+                    "高田馬場の裏事情を知りたいか？",
+                ]
+                return possibilities[Math.floor(Math.random() * possibilities.length)];
+            }
+        }
+
+        class Enemy {
+            constructor(name, health, type, maxSpeed = 1, x, y, isBoss = false, sprite) {
+                this.uid = Math.random().toString(36).substr(2, 9); // unique id
+                console.log("Max speed: ", maxSpeed, typeof maxSpeed);
+                // console.log("Z: ", z, typeof z);
+                // z = z * maxSpeed
+                this.speed = Number(Math.random() * maxSpeed + 1); //assign random speed based on maxSpeed
+                console.log("Speed: ", this.speed, typeof this.speed);
+                this.name = name;
+                this.health = health;
+                this.maxHealth = health;
+                this.maxSpeed = maxSpeed;
+                this.type = type;
+                this.x = x;
+                this.y = y;
+                this.sprite = sprite || new PIXI.Sprite(textures.enemy); // use supplied sprite or fallback to default if none supplied
+                this.inventory = [];
+                this.isBoss = isBoss;
+            }
+
+            // uid = Math.random().toString(36).substr(2, 9); // unique id
+            // speed = Math.random() * this.maxSpeed + 1; //assign random speed based on maxSpeed
+
+            // attack(target) {
+            //     amount = Math.floor(Math.random() * 10 + 1, 10);
+            //     target.health -= amount;
+            // }
+
+            addItem = (item) => {
+                this.inventory.push(item);
+            }
+
+            onHit(amount) {
+                this.health -= amount;
+                const dx = player.sprite.x - this.x;
+                const dy = player.sprite.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const pushBackDistance = 10; // distance to push back
+
+                if (dist > 0) {
+                    this.x -= (dx / dist) * pushBackDistance;
+                    this.y -= (dy / dist) * pushBackDistance;
+                }
+                this.sprite.tint = 0xff0000; // Tint the sprite red
+                setTimeout(() => {
+                    this.sprite.tint = 0xffffff; // Reset the tint after 1 second
+                }, 300);
+                // if (this.health <= 0) {
+                //     this.die();
+                // }
+            }
+
+            useItem = (index) => {
+                const item = this.inventory[index];
+                if (item.type === 'heal') {
+                    this.health = Math.min(this.maxHealth, this.health + item.value);
+                    console.log(`${this.name} used ${item.name}: Healed for ${item.value}. Current health: ${this.health}`);
+                } else if (item.type === 'special') {
+                    console.log(`Used ${item.name}: Effect - ${item.effect}`);
+                }
+                // Remove item from inventory after use
+                this.inventory.splice(index, 1);
+            }
+
+            die() {
+                // drop items
+                this.inventory.forEach(item => {
+                    // drop item
+                });
+                this.sprite.destroy();
+                // remove enemy from enemies array
+                enemies.splice(enemies.indexOf(this), 1);
+            }
+        }
+
+        class Rat extends Enemy {
+            constructor(x, y) {
+                super('Rat', 20, 'enemy', 2, x, y, false, new PIXI.Sprite(textures.enemy_rat));
+            }
+
+            attack(target) {
+                let amount = Math.floor(Math.random() * 10 + 1, 10);
+                target.health -= amount;
+            }
+        }
+
+        class Drunk extends Enemy {
+            constructor(x, y) {
+                super('Drunk', 50, 'enemy', 0.5, x, y, false, new PIXI.Sprite(textures.enemy_drunk));
+            }
+
+            attack(target) {
+                let amount = Math.floor(Math.random() * 20 + 1, 20);
+                target.health -= amount;
+            }
+        }
+        
+        // assign textures for use
+        const textures = {
+            player: PIXI.Texture.from("img/spite-assets/player.png"),
+            landmark: PIXI.Texture.from("img/spite-assets/landmark.png"),
+            enemy: PIXI.Texture.from("img/enemy.png"),
+            background: PIXI.Texture.from("img/background.png"),
+            healthBar: PIXI.Texture.from("img/spite-assets/heart-full.png"),
+            vendingmachine: PIXI.Texture.from("img/spite-assets/vendingmachine.png"),
+            enemy_rat: PIXI.Texture.from("img/spite-assets/rat.png"),
+            enemy_drunk: PIXI.Texture.from("img/spite-assets/drunk.png"),
+
+            // npc_hunter: PIXI.Texture.from("img/sprites/npc_hunter/npc_hunter.gif"),
+            // npc_jon: PIXI.Texture.from("img/sprites/npc_jon/npc_jon.gif"),
+            // enemy_rat: PIXI.Texture.from("img/sprites/enemy_rat/enemy_rat.gif"),
+            // enemy_drunk: PIXI.Texture.from("img/sprites/enemy_drunk/enemy_drunk.gif"),
+        };
+        
+        // Background
+        
+        // utilize the whole background image instead of just a small portion as originally intended
+        const background = new PIXI.Sprite(textures.background, window.innerWidth, window.innerHeight);
+        background.position.set(0, 0);
+        app.stage.addChild(background);
+        
+        // load player sprite and add to stage
+        const player = new Player();
+        player.sprite.anchor.set(0.5);
+        player.sprite.width = 64;
+        player.sprite.height = 64;
+        
+        player.sprite.x = app.screen.width / 2;
+        player.sprite.y = app.screen.height / 2;
+        player.sprite.zIndex = 2;
+        player.sprite.scale.set(4);
+        app.stage.addChild(player.sprite);
+        
+        // player health
+
+        // use heart sprite for health bar
+        // const healthBar = new PIXI.Sprite(textures.healthBar);
+        // healthBar.anchor.set(0.5);
+        // healthBar.x = 50;
+        // healthBar.y = 50;
+        // healthBar.zIndex = 1;
+        // healthBar.scale.set(2);
+        // app.stage.addChild(healthBar);
+
+        const healthBar = new PIXI.Graphics();
+        healthBar.beginFill(0x00ff00);
+        healthBar.drawRect(10, 10, 200, 20);
+        healthBar.endFill();
+        app.stage.addChild(healthBar);
+        
+        // Game objects
+        const gameObjects = [
+            { x: 200, y: 150, type: 'landmark', name: 'さかえ通り', info: 'A popular street filled with restaurants and izakayas', item: { name: 'Beer', type: 'heal', value: 5 }, sprite: null },
+            { x: -300, y: -200, type: 'landmark', name: 'Big Box', info: 'An entertainment hub for Takadanobaba, and an iconic symbol from the 80s.', item: { name: '???', type: 'special', effect: 'Unlock Lore' }, sprite: textures.sprite_bigbox },
+            { x: 100, y: 100, type: 'vendingmachine', name: '自販機', info: '自販機', item: { name: 'Soda', type: 'heal', value: 10 }, sprite: null },
+            { x: 300, y: 200, type: 'vendingmachine', name: '自販機', info: '自販機', item: { name: 'Soda', type: 'heal', value: 10 }, sprite: null }
+        
+        ];
+        
+        // landmarks
+        gameObjects.forEach(obj => {
+            switch (obj.type) {
+                case 'landmark':
+                    let landmark_texture = new PIXI.Sprite(textures.landmark);
+                    landmark_texture.anchor.set(0.5);
+                    landmark_texture.zIndex = 3;
+                    landmark_texture.x = obj.x + app.screen.width / 2;
+                    landmark_texture.y = obj.y + app.screen.height / 2;
+                    landmark_texture.width = 128; // TODO: make it not blurry as shit wtf
+                    landmark_texture.height = 128;
+                    obj.sprite = landmark_texture;
+                    app.stage.addChild(landmark_texture);
+                    break;
+                case 'vendingmachine':
+                    let vendingmachine_texture = new PIXI.Sprite(textures.vendingmachine);
+                    vendingmachine_texture.anchor.set(0.5);
+                    vendingmachine_texture.zIndex = 3;
+                    vendingmachine_texture.x = obj.x + app.screen.width / 2;
+                    vendingmachine_texture.y = obj.y + app.screen.height / 2;
+                    // vendingmachine_texture.width = 64;
+                    // vendingmachine_texture.height = 64;
+                    vendingmachine_texture.scale.set(1.5);
+                    obj.sprite = vendingmachine_texture;
+                    app.stage.addChild(vendingmachine_texture);
+                    break;
+            }
+        });
+        
+        // enemies (spawned on map first maybe)
+        const enemies = [
+            {
+                x: Math.random() * window.innerWidth - 400,
+                y: Math.random() * window.innerHeight - 300,
+                speed: Math.random() * 2 + 1,
+                health: 50,
+                sprite: new PIXI.Sprite(textures.enemy)
+            }
+        ];
+        
+        // State
+        const keys = {};
+        let actionCooldown = 0;
+        
+        // Inventory UI
+        const inventoryElement = document.getElementById('inventory');
+        const inventoryList = document.getElementById('inventory-list');
+        
+        // Event listeners
+        window.addEventListener('keydown', e => {
+            keys[e.code] = true;
+            
+            // inventory with "I"
+            if (e.code === 'KeyI') {
+                toggleInventory();
+                console.log("Inventory toggled");
+            }
+        });
+        window.addEventListener('keyup', e => keys[e.code] = false);
+        
+        // Inventory functions
+        function toggleInventory() {
+            if (inventoryElement.style.display === 'none') {
+                inventoryElement.style.display = 'block';
+                updateInventoryUI();
+            } else {
+                inventoryElement.style.display = 'none';
+            }
+        }
+        
+        // Update inventory UI
+        function updateInventoryUI() {
+            inventoryList.innerHTML = '';
+            playerState.inventory.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${item.name} (${item.type})`;
+                li.dataset.index = index;
+                li.addEventListener('click', () => useItem(index));
+                inventoryList.appendChild(li);
+            });
+        }
+        
+        // Use item function
+        function useItem(index) {
+            const item = playerState.inventory[index];
+            
+            if (item.type === 'heal') {
+                playerState.health = Math.min(playerState.maxHealth, playerState.health + item.value);
+                console.log(`Used ${item.name}: Healed for ${item.value}. Current health: ${playerState.health}`);
+            } else if (item.type === 'special') {
+                console.log(`Used ${item.name}: Effect - ${item.effect}`);
+            }
+            
+            // Remove item from inventory after use
+            playerState.inventory.splice(index, 1);
+            updateInventoryUI();
+        }
+        
+        // Update function
+        function update(delta) {
+            // Movement
+            const move = { x: 0, y: 0 };
+            if (keys['KeyW'] || keys['ArrowUp']) move.y = playerSpeed;
+            if (keys['KeyS'] || keys['ArrowDown']) move.y = -playerSpeed;
+            if (keys['KeyA'] || keys['ArrowLeft']) move.x = playerSpeed;
+            if (keys['KeyD'] || keys['ArrowRight']) move.x = -playerSpeed;
+            if (keys['KeyP']) console.log(playerState);
+            
+            const newX = player.x + move.x;
+            const newY = player.y + move.y;
+            
+            const bgLeft = background.x;
+            const bgTop = background.y;
+            const bgRight = background.x + background.width;
+            const bgBottom = background.y + background.height;
+            
+            background.x += move.x;
+            background.y += move.y;
+            
+            // prevent player from moving beyond the background
+            // if (newX > bgRight || newX < bgLeft) move.x = 0;
+            // if (newY > bgBottom || newY < bgTop) move.y = 0;
+
+            
+            gameObjects.forEach(obj => {
+                
+                obj.sprite.x += move.x;
+                obj.sprite.y += move.y;
+            });
+            
+            enemies.forEach(enemy => {
+                enemy.sprite.x += move.x;
+                enemy.sprite.y += move.y;
+                enemy.sprite.width = 60;
+                enemy.sprite.height = 60;
+
+                // get enemy object
+                // console.log(enemy);
+                
+                // enemies move to attack player
+                const dx = player.sprite.x - enemy.sprite.x;
+                const dy = player.sprite.y - enemy.sprite.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 10) {
+                    enemy.sprite.x += (dx / dist) * enemy.speed;
+                    enemy.sprite.y += (dy / dist) * enemy.speed;
+                }
+
+                // flip the sprite based on direction of movement
+                if (dx > 0) {
+                    enemy.sprite.scale.x = -1;
+                } else {
+                    enemy.sprite.scale.x = 1;
+                }
+
+                // enemies will attack player if within aggro radius, and cooldown is 0 seconds
+                // if (dist <= aggro_radius && actionCooldown <= 0) {
+                //     console.log(`Attacked by ${enemy.name} (${enemy.uid})!`);
+                //     enemy.attack(player);
+                //     actionCooldown = 5;
+                //     setTimeout(() => {
+                //         actionCooldown = 0;
+                //     }, 5000);
+                // }
+
+
+
+                // enemies will attack player if within aggro radius
+                // if (dist <= aggro_radius) {
+                //     // add attack cooldown
+                //     if (actionCooldown <= 0) {
+                //         console.log(`Attacked by ${enemy.name} (${enemy.uid})!`);
+                //         enemy.attack(player);
+                //         actionCooldown = 20;
+                //     } else {
+                //         actionCooldown--;
+                //     }
+                //     // enemy.attack(player);
+                // }
+            });
+            
+            // interact key handling
+            if (keys['Space'] && actionCooldown <= 0) {
+                performAction();
+                actionCooldown = 20;
+                // let dist = 5;
+                // // add code to attack enemies within close proximity
+                // if (dist <= interactionRadius) {
+                //     // attack enemy
+                //     console.log(`Attacked ${enemy.name} (${enemy.uid})!`);
+                //     player.attack(enemy);
+                // }
+
+                let closest = closestEnemy(); // get closest enemy
+                // console.log(closest);
+                if (closest) {
+                    console.log(`Attacked ${closest.name} (${closest.uid})!`);
+                    player.attack(closest);
+                    if (closest.health <= 0) {
+                        closest.die();
+                    }
+                }
+            }
+            
+            if (actionCooldown > 0) actionCooldown--;
+            
+            // Update health bar
+            healthBar.clear();
+            healthBar.beginFill(0x00ff00);
+            healthBar.drawRect(10, 10, (playerState.health / playerState.maxHealth) * 200, 20);
+            healthBar.endFill();
+            // console.log(playerState);
+        }
+        
+        // interact function
+        function performAction() {
+            let interacted = false;
+            
+            // Check gameObjects for interaction
+            for (const obj of gameObjects) {
+                const dx = player.sprite.x - obj.sprite.x;
+                const dy = player.sprite.y - obj.sprite.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                // console.log(`Nearest obj: ${obj.name} (${obj.type}) - Distance: ${dist}`);
+                
+                if (dist <= interactionRadius) {
+                    switch (obj.type) {
+                        case 'landmark':
+                            console.log(`Interacted with ${obj.name}: ${obj.info}`);
+                            playerState.inventory.push(obj.item);
+                            console.log(`Added to inventory: ${obj.item.name}`);
+                            obj.sprite.alpha = 0.5; // Feedback for interaction
+                            interacted = true;
+                            break;
+                        case 'vendingmachine':
+                            console.log(`Interacted with ${obj.name}: ${obj.info}`);
+                            playerState.inventory.push(obj.item);
+                            console.log(`Added to inventory: ${obj.item.name}`);
+                            obj.sprite.alpha = 0.5; // Feedback for interaction
+                            interacted = true;
+                            break;
+                        // case 'enemy':
+                        //     console.log(`Attacked ${obj.name} (${obj.uid})!`);
+                        //     player.attack(obj);
+                            
+                    }
+                    // console.log(`Interacted with ${obj.name}: ${obj.info}`);
+                    // playerState.inventory.push(obj.item);
+                    // console.log(`Added to inventory: ${obj.item.name}`);
+                    // obj.sprite.alpha = 0.5; // Feedback for interaction
+                    // interacted = true;
+                    // break;
+                }
+            }
+        }
+        
+        // Spawn enemies
+        function spawnEnemy(type = "") {
+            let enemy;
+            if (Math.random() > 0.5 || type === 'rat') {
+                enemy = new Rat(Math.random() * 1920 - 960, Math.random() * 1080 - 540);
+            } else {
+                enemy = new Drunk(Math.random() * 1920 - 960, Math.random() * 1080 - 540);
+                // enemy.sprite.scale(2);
+            }
+            // console.log(enemy.speed);
+
+            // Ensure the sprite is fully configured
+            enemy.sprite.anchor.set(0.5);
+            enemy.sprite.x = enemy.x + app.screen.width / 2;
+            enemy.sprite.y = enemy.y + app.screen.height / 2;
+            // enemy.sprite.width = 60;
+            // enemy.sprite.height = 60;
+
+            // Add enemy to global enemies array and to the stage
+            enemies.push(enemy);
+            app.stage.addChild(enemy.sprite);
+
+            console.log(`Spawned enemy (${enemy.name}):`, enemy);
+            return enemy;
+        }
+
+        // Get closest enemy to player. Returns null if no enemies are nearby, otherwise return Enemy object
+        function closestEnemy() {
+            let closest = null;
+            let closestDist = 30; // max distance
+            enemies.forEach(enemy => {
+                const dx = player.sprite.x - enemy.sprite.x;
+                const dy = player.sprite.y - enemy.sprite.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < closestDist) {
+                    closest = enemy;
+                    closestDist = dist;
+                }
+            });
+            return closest;
+        }
+
+        setInterval(spawnEnemy, enemySpawnInterval);
+        app.ticker.add(update);
+    </script>
+</body>
+
+</html>
