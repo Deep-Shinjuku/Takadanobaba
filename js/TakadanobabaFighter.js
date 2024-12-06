@@ -10,6 +10,9 @@ TODO: Disable object interaction after it's been interacted with
 const app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
 console.log(app);
 document.body.appendChild(app.view);
+// window.addEventListener('DOMContentLoaded', (event) => {
+//     document.getElementById('game-view').appendChild(app.view);
+// });
 
 // constants
 const playerSpeed = 3;
@@ -19,6 +22,9 @@ const aggro_radius = 400;
 const enemy_attack_range = 50;
 const modal_pushback_distance = 100;
 const modal_pushback_radius = 50;
+let survival_mode = false;
+
+const game_hud_div = document.getElementById('game-info');
 
 let player = null;
 
@@ -35,7 +41,7 @@ class Player {
         this.health = 100;
         this.maxHealth = 100;
         this.inventory = [];
-        this.invincible = false;
+        this.invincible = survival_mode ? true : false;
 
         this.spawn_time = Date.now();
         this.death_time = null;
@@ -367,7 +373,9 @@ function respawnPlayer() {
     };
 
     // Update the HUD
-    updateHUD(player.name, 1, player.health, player.maxHealth, "00:00", []);
+    if (survival_mode) {
+        updateHUD(player.name, 1, player.health, player.maxHealth, "00:00", []);
+    }
 }
 
 function updateHUD(name, level, health, maxHealth, elapsedTime, buffs) {
@@ -482,6 +490,37 @@ function updateInventoryUI() {
 // Primary game loop
 function update(delta) {
 
+    if (survival_mode) {
+        game_hud_div.innerHTML = `
+        <div class="top-[5rem] bg-white text-black p-4 m-4 rounded-lg shadow-lg z-40 w-64">
+                <div class="flex items-center space-x-4">
+                    <img src="img/sprites/player.svg" class="w-12 h-12 rounded-full border-2 border-black">
+                    <div>
+                        <h2 class="text-lg font-bold" id="character-name">Player</h2>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="text-sm font-semibold">HP</div>
+                    <div class="relative">
+                        <div class="absolute top-0 left-0 h-4 bg-red-600 rounded-full" style="width: 75%;" id="health-bar"></div>
+                        <div class="h-4 bg-gray-500 rounded-full"></div>
+                    </div>
+                    <span class="text-sm text-gray-300" id="character-health"></span>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm">
+                            <span class="font-semibold">存続時間:</span> <span id="elapsed-time">00:00</span>
+                        </div>
+                        <div class="flex space-x-2" id="buff-icons">
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    } else {
+        game_hud_div.innerHTML = '';
+    }
+
     if (!player) return;
 
     // Movement
@@ -539,7 +578,9 @@ function update(delta) {
     const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
     // Update HUD with time played
-    updateHUD(player.name, 1, player.health, player.maxHealth, formattedTime, []);
+    if (survival_mode) {
+        updateHUD(player.name, 1, player.health, player.maxHealth, formattedTime, []);
+    }
     
     // Enemy logic loop
     enemies.forEach(enemy => {
@@ -871,7 +912,9 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => keys[e.code] = false);
 
-enemySpawnTimer = setInterval(spawnEnemy, enemySpawnInterval);
+if (survival_mode) {
+    enemySpawnTimer = setInterval(spawnEnemy, enemySpawnInterval);
+}
 
 // Start the game loop
 app.ticker.add(update);

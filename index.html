@@ -9,6 +9,7 @@
     <script src="js/pixi-gif.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
         body {
             margin: 0;
             overflow: hidden;
@@ -16,6 +17,10 @@
         
         canvas {
             display: block;
+        }
+
+        h1, h2, h3, #header-tags, #header-author {
+            font-family: DotGothic16, sans-serif;
         }
         
         .inventory {
@@ -68,7 +73,7 @@
 
 <body>
     <!-- Floating Navbar -->
-    <nav class="fixed top-0 left-0 right-0 bg-white text-black p-4 m-4 z-50 drop-shadow-xl">
+    <nav class=" top-0 left-0 right-0 bg-white text-black p-4 z-50 drop-shadow-xl">
         <div class="container mx-auto flex items-center">
             <!-- Empty Div to Align the Center Content -->
             <div class="flex-1"></div>
@@ -97,33 +102,87 @@
             </div>
         </div>
     </nav>
-    <div class="fixed top-[5rem] bg-white text-black p-4 m-4 rounded-lg shadow-lg z-40 w-64">
-        <div class="flex items-center space-x-4">
-            <img src="img/sprites/player.svg" class="w-12 h-12 rounded-full border-2 border-black">
-            <div>
-                <h2 class="text-lg font-bold" id="character-name">Player</h2>
+
+    <!-- Page content -->
+    <div class="h-screen overflow-auto">
+        <!-- Page header section -->
+        <div class="flex items-start h-[40%] bg-black w-full" id="page-header">
+            <div class="self-center text-left text-white p-40">
+                <span id="header-tags" class="pl-[32px] text-[20px]">#カルチャー　＃トリップ</span>
+                <h1 id="header-title" class="text-[40px] font-normal">高田馬場って何だ！？新宿の学園都市に潜入</h1>
+                <h3 id="header-subtitle" class="pl-[32px] text-[32px] font-normal">公衆の面前で飲酒するスポットTOP3！</h3>
+                <p id="header-author" class="pl-[32px] text-[16px]">writer:Hunter Nakagawa</p>
             </div>
         </div>
-        <div class="mt-4">
-            <div class="text-sm font-semibold">HP</div>
-            <div class="relative">
-                <div class="absolute top-0 left-0 h-4 bg-red-600 rounded-full" style="width: 75%;" id="health-bar"></div>
-                <div class="h-4 bg-gray-500 rounded-full"></div>
+        <!-- Game view section -->
+        <div id="game-view" class="w-full bg-blue h-[900px]">
+            <!-- Game info panel -->
+            <div id="game-info">
+
             </div>
-            <span class="text-sm text-gray-300" id="character-health"></span>
         </div>
-        <div class="mt-4">
-            <div class="flex justify-between items-center">
-                <div class="text-sm">
-                    <span class="font-semibold">存続時間:</span> <span id="elapsed-time">00:00</span>
+        <!-- Article -->
+        <div id="article">
+
+        </div>
+        <!-- Footer -->
+        <div id="footer" class="flex flex-row w-full justify-between h-3/5 bg-black text-white items-center p-[64px]">
+            <div id="footer-left" class="w-[400px]">
+                <div id="footer-left-socials" class="flex flex-row gap-[16px] pb-[16px]">
+                    <a href="#">
+                        <img src="img/social/instagram-logo 1.svg" class="h-[48px] w-[48px] mr-[16px]" alt="Instagram" />
+                    </a>
+                    <a href="#">
+                        <img src="img/social/x-logo.svg" class="h-[48px] w-[48px] mr-[16px]" alt="Facebook" />
+                    </a>
+                    <a href="#">
+                        <img src="img/social/line-logo.svg" class="h-[48px] w-[48px]" alt="Twitter" />
+                    </a>
                 </div>
-                <div class="flex space-x-2" id="buff-icons">
-                    <img src="img/buff-icon.svg" alt="Buff" class="w-6 h-6">
-                    <img src="img/debuff-icon.svg" alt="Debuff" class="w-6 h-6">
+                <hr class="py-[8px]" />
+                <div id="footer-left-articles">
+                    <span class="text-[32px] font-bold ">1月号</span>
+                    <ul>
+                        <li class="py-[4px]">
+                            <a>
+                                <span>No.1 新(ネオ)レトロ再燃！ 新宿、今こそ喫茶でしょ。</span>
+                            </a>
+                        </li>
+                        <li class="py-[4px]">
+                            <a>
+                                <span>No.2 はじまりのコリアンタウン</span>
+                            </a>
+                        </li>
+                        <li class="py-[4px]">
+                            <a>
+                                <span>No.3 新宿駅に”地底人”！？</span>
+                            </a>
+                        </li>
+                        <li class="py-[4px]">
+                            <a>
+                                <span>No.4 コズミックパワー全開！！<宇宙村>の神秘</span>
+                            </a>
+                        </li>
+                        <li class="py-[4px]">
+                            <a>
+                                <span>No.5 高田馬場って何だ！？新宿の学園都市に潜入</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <hr class="pt-[8px]" />
+                    <div class="text-right">
+                        <a href="#">バックナンバーを見る →</a>
+                    </div>
                 </div>
+            </div>
+            <div id="footer-right" class="flex flex-col text-right">
+                <img src="img/mayu-white.svg" class="inline-block h-[106px]" alt="Logo" />
+                <span class="text-[12px] font-medium">©2024 by MAYU-Editorial department, ltd.(Tokyo) </span>
             </div>
         </div>
     </div>
+
+    <!-- Inventory -->
     <div class="inventory" id="inventory">
         <!-- may remove in the future as it's not necessarily needed -->
         <strong>Inventory:</strong>
@@ -145,17 +204,18 @@
         </ul>
         
     </div>
+
     <!-- Infobox -->
     <div id="infobox-modal" class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-10" id="landmark-modal">
         <div id="infobox-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
-            <div id="infobox-header" class="modal-header flex bg-black text-green-400 text-4xl font-bold items-center justify-between h-16">
+            <div id="infobox-header" class="modal-header flex bg-[#003BFF] text-[#E5FF00] text-4xl font-bold items-center justify-between h-16">
                 <!-- Title -->
                 <div class="flex-1 flex items-center">
                     <h1 id="infobox-title" class="p-2"></h1>
                 </div>
                 <!-- Close Button -->
-                <div id="infobox-actions" class="aspect-square h-full bg-[#00FF95] flex items-center justify-center cursor-pointer">
-                    <button id="infobox-close" class="text-black text-5xl font-bold">&times;</button>
+                <div id="infobox-actions" class="aspect-square h-full bg-[#E5FF00] flex items-center justify-center cursor-pointer">
+                    <button id="infobox-close" class="text-[#003BFF] text-5xl font-bold">&times;</button>
                 </div>
             </div>
             <!-- Content -->
