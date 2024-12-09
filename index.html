@@ -8,22 +8,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.0/pixi.min.js"></script>
     <script src="js/pixi-gif.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/TakadanobabaFighter.js" defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
         body {
             margin: 0;
             overflow: hidden;
         }
-        
+
         canvas {
             display: block;
         }
 
-        h1, h2, h3, #header-tags, #header-author {
+        h1,
+        h2,
+        h3,
+        #header-tags,
+        #header-author {
             font-family: DotGothic16, sans-serif;
         }
-        
-        .inventory {
+
+        /* .inventory {
             position: absolute;
             bottom: 10px;
             left: 10px;
@@ -35,24 +41,23 @@
             border-radius: 8px;
             display: none;
         }
-        
+
         .inventory ul {
             list-style: none;
             margin: 0;
             padding: 0;
         }
-        
+
         .inventory li {
             cursor: pointer;
             padding: 5px;
         }
-        
+
         .inventory li:hover {
             background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .dialogue
-        {
+        } */
+
+        .dialogue {
             position: absolute;
             bottom: 10px;
             right: 10px;
@@ -63,9 +68,48 @@
             font-size: 14px;
             border-radius: 8px;
             display: none;
+
             .dialogue-character {
                 float: left;
                 margin-right: 10px;
+            }
+        }
+
+        #dropdown-menu {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform: translateY(-10px);
+            opacity: 0;
+        }
+
+        #dropdown-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .rotateLeft {
+            animation: rotateLeft 1s linear;
+        }
+        .rotateRight {
+            animation: rotateRight 1s linear;
+        }
+
+        @keyframes rotateLeft {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(-90deg);
+            }
+        }
+
+        @keyframes rotateRight {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(90deg);
             }
         }
     </style>
@@ -73,16 +117,16 @@
 
 <body>
     <!-- Floating Navbar -->
-    <nav class=" top-0 left-0 right-0 bg-white text-black p-4 z-50 drop-shadow-xl">
+    <nav class=" top-0 left-0 right-0 bg-white text-black p-4 z-50 drop-shadow-xl h-full">
         <div class="container mx-auto flex items-center">
             <!-- Empty Div to Align the Center Content -->
             <div class="flex-1"></div>
-            
+
             <!-- Centered SVG -->
             <div class="flex-none text-center">
                 <img src="img/mayu.svg" class="inline-block h-8" alt="Logo" />
             </div>
-    
+
             <!-- Hamburger Menu -->
             <div class="flex-1 text-right">
                 <button id="hamburger-menu" class="text-black flex-col" onclick="toggleNavMenu()">
@@ -92,9 +136,9 @@
                 </button>
             </div>
         </div>
-    
+
         <!-- Dropdown Menu -->
-        <div id="dropdown-menu" class="hidden absolute top-full left-0 right-0 bg-white shadow-lg">
+        <div id="dropdown-menu" class="hidden absolute top-full left-0 right-0 bg-white shadow-lg z-100">
             <div class="flex">
                 <div id="navbar-navigation" class="flex-1 p-4">
                     test
@@ -115,22 +159,203 @@
             </div>
         </div>
         <!-- Game view section -->
-        <div id="game-view" class="w-full bg-blue h-[900px]">
-            <!-- Game info panel -->
-            <div id="game-info">
+        <div id="game-view" class="w-full bg-blue h-[900px] relative">
 
+            <button id="toggle-survival" class="absolute bottom-4 right-4 p-2 bg-[#00FF95] rounded-full shadow-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 opacity-50" onclick="toggleSurvivalMode()">
+                <img src="img/sprites/survival_mode.svg" class="h-8" alt="Survival Mode" />
+            </button>
+            <!-- Game info panel -->
+            <div id="game-info" class="absolute top-4 left-4 hidden z-50">
+
+            </div>
+            <!-- Inventory -->
+            <div class="inventory absolute bottom-2.5 left-2.5 bg-black bg-opacity-70 text-white p-2.5 font-sans text-sm rounded-lg hidden" id="inventory">
+                <strong>Inventory:</strong>
+                <ul id="inventory-list" class="list-none m-0 p-0"></ul>
+            </div>
+            <!-- <div class="inventory" style="display: none;">
+                <strong>Keys:</strong>
+                <ul id="inventory-list">
+                    <li>[ WASD/Arrow ] 移動</li>
+                    <li>[ Space ] 使用・打つ</li>
+                    <li>[ I ] Inventory</li>
+                     add more instructions later... should it always be visible? -->
+                <!-- </ul>
+                <strong>Directions:</strong>
+                <ul id="inventory-list">
+                    <li>地図を探検して、ランドマークで高田馬場についてもっと知ろう</li>
+                    <li>酔っ払ってるサラリーマン/動物園のネズミに打つ</li>
+                    <li>アイテムを集めて高田馬場庇う！</li>
+                </ul>
+            </div> -->
+
+            <!-- Infobox -->
+            <div id="infobox-modal"
+                class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-10"
+                id="landmark-modal">
+                <div id="infobox-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
+                    <div id="infobox-header"
+                        class="modal-header flex bg-[#003BFF] text-[#E5FF00] text-4xl font-bold items-center justify-between h-16">
+                        <!-- Title -->
+                        <div class="flex-1 flex items-center">
+                            <h1 id="infobox-title" class="p-2"></h1>
+                        </div>
+                        <!-- Close Button -->
+                        <div id="infobox-actions"
+                            class="aspect-square h-full bg-[#E5FF00] flex items-center justify-center cursor-pointer">
+                            <button id="infobox-close" class="text-[#003BFF] text-5xl font-bold">&times;</button>
+                        </div>
+                    </div>
+                    <!-- Content -->
+                    <div id="infobox-body" class="flex flex-col mt-4 px-4 font-[700] text-[16px]">
+                        <div id="infobox-body-image" class="flex-1 p-[32px]">
+                            <img id="infobox-body-img" src="">
+                        </div>
+                        <div id="infobox-body-text" class="flex-1 p-[32px]">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Minimap -->
+            <div id="minimap"
+                class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 pt-10">
+                <div id="minimap-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
+                    <div id="minimap-header"
+                        class="modal-header flex bg-black text-green-400 text-4xl font-bold items-center justify-between h-16">
+                        <!-- Title -->
+                        <div class="flex-1 flex items-center">
+                            <h1 id="minimap-title" class="p-2">ミニマップ</h1>
+                        </div>
+                        <!-- Close Button -->
+                        <div id="minimap-actions"
+                            class="aspect-square h-full bg-[#00FF95] flex items-center justify-center cursor-pointer"
+                            onclick="toggleMinimap()">
+                            <button id="minimap-close" class="text-black text-5xl font-bold">&times;</button>
+                        </div>
+                    </div>
+                    <!-- Content -->
+                    <div id="minimap-body" class="modal-body mt-4 px-4">
+                        <img src="img/minimap.png" />
+                    </div>
+                </div>
+            </div>
+            <!-- Game over screen -->
+            <div id="gameover-modal"
+                class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-10"
+                id="landmark-modal">
+                <div id="gameover-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
+                    <div id="gameover-header"
+                        class="modal-header flex bg-black text-green-400 text-4xl font-bold items-center justify-between h-16">
+                        <!-- Title -->
+                        <div class="flex-1 flex items-center">
+                            <h1 id="gameover-title" class="p-2">GAME OVER</h1>
+                        </div>
+                        <!-- Close Button -->
+                        <div id="gameover-actions" class="aspect-square h-full bg-[#00FF95] flex items-center justify-center cursor-pointer">
+                            <button id="gameover-close" class="text-black text-5xl font-bold" onclick="document.getElementById('gameover-modal').style.display = 'none'">&times;</button>
+                        </div>
+                    </div>
+                    <!-- Content -->
+                    <div id="gameover-body" class="flex mt-4 px-4 font-[700] text-[16px]">
+                        <div id="gameover-body-stats" class="flex-1 p-[32px]">
+                            <ul>
+                                <li>存続時間（秒）: <span id="player-time_played"></span></li>
+                                <li>与えたダメージ: <span id="player-damage_dealt"></span></li>
+                                <li>受けたダメージ: <span id="player-damage_taken"></span></li>
+                                <li>負けした敵数: <span id="player-enemies_killed"></span></li>
+                                <li>集めたアイテム数: <span id="player-items_collected"></span></li>
+                                <li>アイテムを使った回数: <span id="player-items_used"></span></li>
+                                <li>訪ねたランドマーク数: <span id="player-landmarks_visited"></span></li>
+                                <li>回復量: <span id="player-healed"></span></li>
+                            </ul>
+                            <h2 id="player-total_score" class="text-4xl pt-2"></h2>
+                        </div>
+                        <div id="gameover-body-text" class="flex-1 p-[32px] text-4xl">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Article -->
-        <div id="article">
-
+        <div id="articles max-h-full">
+            <div id="article-expander" class="flex h-1/8 bg-[#003BFF] p-[16px] align-center justify-center cursor-pointer text-white" onclick="toggleArticle()">
+                <h3><span id="article-expander-rightarr">&rarr;</span> 代わりに全体の記事を表示されます <span id="article-expander-leftarr">&larr;</span></h3>
+            </div>
+            <!-- when article-expander is clicked, #article expands to reveal the text that is in the game, so people who dont want to play can read instead -->
+            <div id="article" class="py-24 px-96 hidden">
+                <h1 class="text-5xl inline-block px-2 bg-[#003BFF] py-4 text-white" id="article-title">高田馬場へようこそ！！</h1>
+                <br />
+                <p>おっ、なんだこれ！？人前で飲んでる人！？輪になってタバコ吸ってる人？外国人だらけじゃないか！どうなってるんだな！？</p>
+                <div id="article-overview" class="py-8">
+                    <img src="img/article_assets/takadanobaba.jpg" class="">
+                    <p class="pt-4">ここ高田馬場は新宿区の大学生、日本語学習者の拠点！教育の中心地みたいね！新しい出会える人もたくさんいるよ。見どころ満載です！ほらー、きてきて！</p>
+                </div>
+                <div id="article-landmarks" class="">
+                    <div id="article-landmark-rotary" class="py-8">
+                        <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">ロータリー</h2>
+                        <img class="py-4" src="img/article_assets/rotary_2.jpg">
+                        <p class="pt-4">こっちはタバコを吸ったり、お酒を飲んだりする場所ですよ。「ここは喫煙禁止」と書かれた掲示が見える？ここの人たちはそれを提案として受け止めているんだ。マジでクレイジーでしょ？！ロータリーはいつも人間で賑わっているから、たまには遊びにおいでよね！</p>
+                        <p class="pt-4">このエリアは飲んだ後に友達たちとたむろするのに最適な場所だ！特に居酒屋でビールを一杯飲んだ後は、夜風がとても爽やかだ！しかし、エンターテインメントはそれだけではありまーーーーーーせん！たまにネズミを見ることもできる。まるで動物園だ！（警告：ネズミを撫でないでください。）</p>
+                    </div>
+                    <div id="article-landmark-sakae" class="py-8">
+                        <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">さかえ通り</h2>
+                        <img class="py-4" src="img/article_assets/sakae_1.jpg" />
+                        <p class="pt-4">この道には居酒屋、レストラン、屋台、バー、クラブが一杯あるよ！この狭い通りにどれだけの人がいるかわかる？それがこの地域がいかに活気に満ちているかを物語っている。絶対に退屈しない！あ、見てくれ！動物園のネズミが戻ってきた！(厳重警告：ネズミを撫でないでください）</p>
+                    </div>
+                    <div id="article-landmark-bigbox" class="py-8">
+                        <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">Big Box</h2>
+                        <img class="py-4" src="img/article_assets/bigbox.jpg" />
+                        <p class="pt-4">高田馬場のランドマーク、Big Box！中にはお店、レストラン、フィットネスクラブ、ゲームセンターまでたっぷりあるよ！なんてこった！窓はどこ！？そうですね：Big Boxには窓がない。だから、基本的に時間を知ることは不可能です！深夜だとわかるのは、追い出されたときだけだ。結構楽しいよ！僕と友達はここで数え切れないほどの時間を過ごした。懐かしい思い出だ。ほとんどが強制送還されてしまったのが残念だ。</p>
+                    </div>
+                    <div id="article-landmark-mural" class="py-8">
+                        <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">手塚の壁画</h2>
+                        <img class="py-4" src="img/article_assets/mural.jpg" />
+                        <p class="pt-4">あっ、鉄腕アトムがいる。何でここにいるんだろう？まあ、ここで生まれたからだよ！そうです！世界的な漫画家、手塚治虫様がこの高田馬場で鉄腕アトムを生み出したのだ！手塚治虫様は大阪で生まれだけど、ほぼ一生を高田馬場で過ごしたんだ。だから、手塚様が亡くなったとき、生涯を記念する壁画が作られた。この壁画には、彼の他の作品も祀られている。</p>
+                    </div>
+                    <div id="article-landmark-street" class="py-8">
+                        <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">不明通り</h2>
+                        <img class="py-4" src="img/article_assets/unnamed_street.jpg" />
+                        <p class="pt-4">この通りが見えますか？高田馬場で日本語学校に通っていた頃、毎日のように通った道だ。いい思い出がたくさんあります。この白いパーカーを着ている男がいるでしょ？高田馬場で出会った親友だ。</p>
+                    </div>
+                    <div id="article-landmark-vendingmachine" class="py-8">
+                        <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">秘密の自販機</h2>
+                        <img class="py-4" src="img/article_assets/jihanki_1.jpg" />
+                        <p class="pt-4">もし1000円あったら、この秘密の自販機を見つけに来てね！本当に不思議な自販機です。何が出てくるかはランダムだけど、多分めっちゃくちゃカッコイイよ！ほら、あの変人も懐中電灯を手に入れたよ！どこにあるかは教えませんけどｗｗｗｗ。高田馬場を探検しに来てね！</p>
+                    </div>
+                    <div id="article-landmark-top3" class="py-8">
+                        <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">公衆の面前で飲酒するスポットTOP3紹介</h2>
+                        <!-- <img src="img/article_assets/DSC03503.JPG" /> -->
+                        <p class="pt-4">皆さんお待ちかねの最終章は、俺が選ぶ公共の場で飲めるスポットTOP3だ！</p>
+                        <p class="pt-4">さて、人前で飲むといえば、アルコール飲料のことだ。ポカリスエットのことだと思った？NO！強い酒のことだ。好きな場所で飲めるのなら、なおさらだ！というわけで、人前でお酒が飲める場所ベスト3を紹介しよう：</p>
+                        <ul>
+                            <li class="py-8">
+                                <h3 class="text-2xl bg-[#CD7F32] px-2 py-2">3位：ロータリー</h3>
+                                <img class="py-2" src="img/article_assets/rotary.jpg" />
+                                <p class="pt-4">これは逃げの答えのようだが、ここは飲むには本当に楽しい場所だ！近くで飲んでいる人たちがいて、活気ある雰囲気が、より一層活力を与えてくれる！友達がいないから一人で飲む？それもいいよ！一人で飲んでいれば、そのうち誰かが誘ってくれる！普通の社交文化とは全く逆でしょう？</p>
+                            </li>
+                            <li class="py-8">
+                                <h3 class="text-2xl bg-[#C0C0C0] px-2 py-2">2位：さかえ通り</h3>
+                                <img class="py-2" src="img/article_assets/sakae_2.jpg" />
+                                <p class="pt-4">さかえ通りは、高田馬場の中心地だ！ここにはたくさんのバー、居酒屋、クラブがある！どこで飲むか迷ったら、さかえ通りに行けばいい！</p>
+                            </li>
+                            <li class="py-8">
+                                <h3 class="text-2xl bg-[#FFD700] px-2 py-2 font-bold">1位：この道</h3>
+                                <img class="py-2" src="img/article_assets/drinking_spot1.jpg" />
+                                <p class="pt-4">超真面目に言うけど、高田馬場で一番飲める場所だよ。友達を何人か誘って、コンビニで飲み物（もちろんお酒）をたくさん買って、この通りの脇をぶらぶらしながら飲んでください。この通りをさらに奥に進むと神田川があり、そこで他の人たちも飲んでいる可能性が高い！</p>
+                                <p class="pt-4">賑やかな街の片隅で、仲間と酒を酌み交わしながら、ただぶらぶらすることは最高だよ。</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- Footer -->
         <div id="footer" class="flex flex-row w-full justify-between h-3/5 bg-black text-white items-center p-[64px]">
             <div id="footer-left" class="w-[400px]">
                 <div id="footer-left-socials" class="flex flex-row gap-[16px] pb-[16px]">
                     <a href="#">
-                        <img src="img/social/instagram-logo 1.svg" class="h-[48px] w-[48px] mr-[16px]" alt="Instagram" />
+                        <img src="img/social/instagram-logo 1.svg" class="h-[48px] w-[48px] mr-[16px]"
+                            alt="Instagram" />
                     </a>
                     <a href="#">
                         <img src="img/social/x-logo.svg" class="h-[48px] w-[48px] mr-[16px]" alt="Facebook" />
@@ -181,121 +406,39 @@
             </div>
         </div>
     </div>
-
-    <!-- Inventory -->
-    <div class="inventory" id="inventory">
-        <!-- may remove in the future as it's not necessarily needed -->
-        <strong>Inventory:</strong>
-        <ul id="inventory-list"></ul>
-    </div>
-    <div class="inventory" style="display: none;">
-        <strong>Keys:</strong>
-        <ul id="inventory-list">
-            <li>[ WASD/Arrow ] 移動</li>
-            <li>[ Space ] 使用・打つ</li>
-            <li>[ I ] Inventory</li>
-            <!-- add more instructions later... should it always be visible? -->
-        </ul>
-        <strong>Directions:</strong>
-        <ul id="inventory-list">
-            <li>地図を探検して、ランドマークで高田馬場についてもっと知ろう</li>
-            <li>酔っ払ってるサラリーマン/動物園のネズミに打つ</li>
-            <li>アイテムを集めて高田馬場庇う！</li>
-        </ul>
-        
-    </div>
-
-    <!-- Infobox -->
-    <div id="infobox-modal" class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-10" id="landmark-modal">
-        <div id="infobox-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
-            <div id="infobox-header" class="modal-header flex bg-[#003BFF] text-[#E5FF00] text-4xl font-bold items-center justify-between h-16">
-                <!-- Title -->
-                <div class="flex-1 flex items-center">
-                    <h1 id="infobox-title" class="p-2"></h1>
-                </div>
-                <!-- Close Button -->
-                <div id="infobox-actions" class="aspect-square h-full bg-[#E5FF00] flex items-center justify-center cursor-pointer">
-                    <button id="infobox-close" class="text-[#003BFF] text-5xl font-bold">&times;</button>
-                </div>
-            </div>
-            <!-- Content -->
-            <div id="infobox-body" class="flex mt-4 px-4 font-[700] text-[16px]">
-                <div id="infobox-body-image" class="flex-1 p-[32px]">
-                    <img id="infobox-body-img" src="">
-                </div>
-                <div id="infobox-body-text" class="flex-1 p-[32px]">
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Minimap -->
-    <div id="minimap" class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 pt-10">
-        <div id="minimap-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
-            <div id="minimap-header" class="modal-header flex bg-black text-green-400 text-4xl font-bold items-center justify-between h-16">
-                <!-- Title -->
-                <div class="flex-1 flex items-center">
-                    <h1 id="minimap-title" class="p-2">ミニマップ</h1>
-                </div>
-                <!-- Close Button -->
-                <div id="minimap-actions" class="aspect-square h-full bg-[#00FF95] flex items-center justify-center cursor-pointer" onclick="toggleMinimap()">
-                    <button id="minimap-close" class="text-black text-5xl font-bold">&times;</button>
-                </div>
-            </div>
-            <!-- Content -->
-            <div id="minimap-body" class="modal-body mt-4 px-4">
-                <img src="img/minimap.png" />
-            </div>
-        </div>
-    </div>
-    <!-- Game over screen -->
-    <div id="gameover-modal" class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-10" id="landmark-modal">
-        <div id="gameover-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
-            <div id="gameover-header" class="modal-header flex bg-black text-green-400 text-4xl font-bold items-center justify-between h-16">
-                <!-- Title -->
-                <div class="flex-1 flex items-center">
-                    <h1 id="gameover-title" class="p-2">GAME OVER</h1>
-                </div>
-                <!-- Close Button -->
-                <!-- <div id="gameover-actions" class="aspect-square h-full bg-[#00FF95] flex items-center justify-center cursor-pointer">
-                    <button id="gameover-close" class="text-black text-5xl font-bold">&times;</button>
-                </div> -->
-            </div>
-            <!-- Content -->
-            <div id="gameover-body" class="flex mt-4 px-4 font-[700] text-[16px]">
-                <div id="gameover-body-stats" class="flex-1 p-[32px]">
-                    <ul>
-                        <li>時間（秒）: <span id="player-time_played"></span></li>
-                        <li>ダメージあげた: <span id="player-damage_dealt"></span></li>
-                        <li>ダメージ与えた: <span id="player-damage_taken"></span></li>
-                        <li>負けした敵数: <span id="player-enemies_killed"></span></li>
-                        <li>集めたアイテム数: <span id="player-items_collected"></span></li>
-                        <li>アイテムを使った回数: <span id="player-items_used"></span></li>
-                        <li>訪ねたランドマーク数: <span id="player-landmarks_visited"></span></li>
-                        <li>回復量: <span id="player-healed"></span></li>
-                    </ul>
-                    <h2 id="player-total_score" class="text-4xl pt-2"></h2>
-                </div>
-                <div id="gameover-body-text" class="flex-1 p-[32px] text-4xl">
-                </div>
-            </div>
-        </div>
-    </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var imported = document.createElement('script');
-            imported.src = 'js/TakadanobabaFighter.js';
-            document.head.appendChild(imported);
-            // document.addEventListener('contextmenu', event => event.preventDefault());
-        })
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     var imported = document.createElement('script');
+        //     imported.src = 'js/TakadanobabaFighter.js';
+        //     document.head.appendChild(imported);
+        //     // document.addEventListener('contextmenu', event => event.preventDefault());
+        // })
 
         function toggleNavMenu() {
-            var dropdownMenu = document.getElementById('dropdown-menu');
-            if (dropdownMenu.classList.contains('hidden')) {
-                dropdownMenu.classList.remove('hidden');
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            dropdownMenu.classList.toggle('active');
+            dropdownMenu.classList.toggle('hidden');
+        }
+
+        function toggleArticle() {
+            var article = document.getElementById('article');
+            var article_expander_rarr = document.getElementById('article-expander-rightarr');
+            var article_expander_larr = document.getElementById('article-expander-leftarr');
+            if (article.classList.contains('hidden')) {
+                article_expander_rarr.classList.add('rotateRight');
+                article_expander_larr.classList.add('rotateLeft');
+                article.classList.remove('hidden');
             } else {
-                dropdownMenu.classList.add('hidden');
+                article_expander_rarr.classList.remove('rotateRight');
+                article_expander_larr.classList.remove('rotateLeft');
+                article.classList.add('hidden');
             }
         }
+        window.addEventListener('keydown', function(e) {
+            if(e.keyCode == 32 && e.target == document.getElementById('game-view')) {
+                e.preventDefault();
+            }
+        });
     </script>
     <!-- <script type="text/javascript" src="js/TakadanobabaFighter.js"></script> -->
 </body>
