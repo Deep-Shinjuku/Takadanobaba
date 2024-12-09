@@ -402,10 +402,7 @@ function spawnPlayer() {
     app.stage.addChild(player.sprite);
     // return player;
 
-    if (!app.ticker.started) {
-        console.log("Starting game loop...");
-        app.ticker.add(update);
-    }
+    app.ticker.add(update);
 }
 
 spawnPlayer();
@@ -837,18 +834,20 @@ function update(delta) {
 
     // Movement
     const move = { x: 0, y: 0 };
+    const scaled_speed = playerSpeed * delta;
+
     if (keys['KeyW'] || keys['ArrowUp']) {
-        move.y = playerSpeed;
+        move.y = scaled_speed;
     }
     if (keys['KeyS'] || keys['ArrowDown']) {
-        move.y = -playerSpeed;
+        move.y = -scaled_speed;
     }
     if (keys['KeyA'] || keys['ArrowLeft']) {
-        move.x = playerSpeed;
+        move.x = scaled_speed;
         player.sprite.scale.x = 1;
     }
     if (keys['KeyD'] || keys['ArrowRight']) {
-        move.x = -playerSpeed;
+        move.x = -scaled_speed;
         player.sprite.scale.x = -1;
     }
     if (keys['KeyP']) console.log(player);
@@ -920,8 +919,9 @@ function update(delta) {
         if (dist <= aggro_radius) {
             // console.log(`Enemy ${enemy.name} (${enemy.uid}) is attacking player!`);
             if (dist > enemy_attack_range) {
-                enemy.sprite.x += (dx / dist) * enemy.speed;
-                enemy.sprite.y += (dy / dist) * enemy.speed;
+                let scaled_enemy_speed = enemy.speed * delta;
+                enemy.sprite.x += (dx / dist) * scaled_enemy_speed;
+                enemy.sprite.y += (dy / dist) * scaled_enemy_speed;
             }
             if (dist <= enemy_attack_range && enemy.attackCooldown === 0) enemy.attack(player);
         }
@@ -1088,7 +1088,8 @@ function gameOver() {
     stat_healed.textContent = player.statistics.healed;
 
     // calculate total score
-    let total_score = (player.statistics.damage_dealt - player.statistics.damage_taken + player.statistics.enemies_killed - player.statistics.healed) * (1 * player.statistics.landmarks_visited);
+    let total_score = (player.statistics.damage_dealt - player.statistics.damage_taken + player.statistics.enemies_killed - player.statistics.healed);
+    if (player.statistics.landmarks_visited >= 1) total_score *= player.statistics.landmarks_visited;
 
     stat_total_score.textContent = total_score;
 
@@ -1260,4 +1261,4 @@ window.addEventListener('resize', () => {
 });
 
 // Start the game loop
-app.ticker.add(update);
+// app.ticker.add(update);

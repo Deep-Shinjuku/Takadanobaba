@@ -129,19 +129,28 @@
 
             <!-- Hamburger Menu -->
             <div class="flex-1 text-right">
-                <button id="hamburger-menu" class="text-black flex-col" onclick="toggleNavMenu()">
-                    <div class="w-8 h-2 bg-black"></div>
-                    <div class="w-8 h-2 bg-black"></div>
-                    <div class="w-8 h-2 bg-black"></div>
-                </button>
+                <button class="absolute right-0 top-1/2 -translate-y-1/2 h-[64px] p-4 bg-white transition-colors duration-300" aria-label="Toggle Navigation Menu"aria-expanded="false" onclick="toggleNavMenu()">
+                <svg class="w-8 h-8 transition-colors duration-300" viewBox="0 0 403.49 403.49" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                  <g>
+                    <rect width="403.49" height="80.7" />
+                    <rect y="161.4" width="403.49" height="80.69" />
+                    <rect y="322.79" width="403.49" height="80.7" />
+                  </g>
+                </svg>
+              </button>
             </div>
         </div>
 
         <!-- Dropdown Menu -->
-        <div id="dropdown-menu" class="hidden absolute top-full left-0 right-0 bg-white shadow-lg z-100">
+        <div id="dropdown-menu" class="hidden absolute top-full left-0 right-0 bg-white shadow-lg z-100 h-full">
             <div class="flex">
-                <div id="navbar-navigation" class="flex-1 p-4">
-                    test
+                <div id="navbar-navigation" class="flex flex-row w-full h-full">
+                    <div id="monthly-nav" class="flex-1 h-full basis-[40%] justify-self-center self-center bg-black text-white">
+                        test
+                    </div>
+                    <div id="articles-nav" class="flex-1 basis-[60%]">
+                        test
+                    </div>
                 </div>
             </div>
         </div>
@@ -159,7 +168,7 @@
             </div>
         </div>
         <!-- Game view section -->
-        <div id="game-view" class="w-full bg-blue h-[900px] relative">
+        <div id="game-view" class="w-full bg-blue h-[90%] relative">
 
             <button id="toggle-survival" class="absolute bottom-4 right-4 p-2 bg-[#00FF95] rounded-full shadow-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 opacity-50" onclick="toggleSurvivalMode()">
                 <img src="img/sprites/survival_mode.svg" class="h-8" alt="Survival Mode" />
@@ -172,6 +181,56 @@
             <div class="inventory absolute bottom-2.5 left-2.5 bg-black bg-opacity-70 text-white p-2.5 font-sans text-sm rounded-lg hidden" id="inventory">
                 <strong>Inventory:</strong>
                 <ul id="inventory-list" class="list-none m-0 p-0"></ul>
+            </div>
+            <div id="instructions" class="absolute top-4 right-4 z-50">
+                <div class="top-[5rem] bg-white text-black p-4 m-4 shadow-lg z-40 w-72">
+                    <div>
+                        <h1 class="text-2xl font-bold bg-[#003BFF] text-white p-2">高田馬場ファイターズ</h1>
+                    </div>
+                    <!-- <div class="flex items-center space-x-4">
+                        <img src="img/sprites/player.svg" class="w-12 h-12 rounded-full border-2 border-black">
+                        <div class="flex-1">
+                            <div class="text-sm font-semibold">HP</div>
+                            <div class="relative w-full h-4 bg-gray-500 rounded-full overflow-hidden">
+                                Health bar fills the width dynamically
+                                <div id="health-bar" 
+                                     class="absolute top-0 left-0 h-full bg-red-600 rounded-full transition-all duration-300"
+                                     style="width: 75%;"></div>
+                            </div>
+                            <span class="text-sm text-gray-300" id="character-health">75 / 100</span>
+                        </div>
+                    </div> -->
+                    <div class="">
+                        <div class=" justify-between items-center">
+                            <div class="text-sm" id="controls">
+                                <ul class="py-2">
+                                    <li><span class="font-extrabold">[ WASD ]</span> 移動</li>
+                                    <li><span class="font-extrabold">[ F ]</span> 相互作用・打つ</li>
+                                </ul>
+                            </div>
+                            <div id="directions" class="text-sm">
+                                <h2 class="font-bold bg-[#003BFF] text-white inline-block p-1">やり方</h2>
+                                <p>高田馬場を探索し、さらに詳しく知る！</p>
+                                <p>チャレンジしてみませんか？右下の<span class="bg-[#FF2F00] text-white font-bold">「サバイバルモード」</span>をオンにして！</p>
+                            </div>
+                            <div class="flex space-x-2" id="buff-icons">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <strong>Keys:</strong>
+                <ul id="inventory-list">
+                    <li>[ WASD/Arrow ] 移動</li>
+                    <li>[ Space ] 使用・打つ</li>
+                    <li>[ I ] Inventory</li>
+                     add more instructions later... should it always be visible?
+                </ul>
+                <strong>Directions:</strong>
+                <ul id="inventory-list">
+                    <li>地図を探検して、ランドマークで高田馬場についてもっと知ろう</li>
+                    <li>酔っ払ってるサラリーマン/動物園のネズミに打つ</li>
+                    <li>アイテムを集めて高田馬場庇う！</li>
+                </ul> -->
             </div>
             <!-- <div class="inventory" style="display: none;">
                 <strong>Keys:</strong>
@@ -262,8 +321,8 @@
                                 <li>存続時間（秒）: <span id="player-time_played"></span></li>
                                 <li>与えたダメージ: <span id="player-damage_dealt"></span></li>
                                 <li>受けたダメージ: <span id="player-damage_taken"></span></li>
-                                <li>負けした敵数: <span id="player-enemies_killed"></span></li>
-                                <li>集めたアイテム数: <span id="player-items_collected"></span></li>
+                                <li>負けした敵の数: <span id="player-enemies_killed"></span></li>
+                                <li>集めたアイテムの数: <span id="player-items_collected"></span></li>
                                 <li>アイテムを使った回数: <span id="player-items_used"></span></li>
                                 <li>訪ねたランドマーク数: <span id="player-landmarks_visited"></span></li>
                                 <li>回復量: <span id="player-healed"></span></li>
