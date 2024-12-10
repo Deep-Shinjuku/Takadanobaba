@@ -9,8 +9,8 @@
     <script src="js/pixi-gif.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/TakadanobabaFighter.js" defer></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
+    <!-- <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script> -->
+    <!-- <script src="js/dropdown.js"></script> -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
@@ -86,6 +86,7 @@
             opacity: 0;
             z-index: 100;
             position: absolute;
+
             #dpdm-left {
                 button:hover {
                     cursor: pointer;
@@ -102,6 +103,7 @@
         .rotateLeft {
             animation: rotateLeft 1s linear;
         }
+
         .rotateRight {
             animation: rotateRight 1s linear;
         }
@@ -128,7 +130,7 @@
     </style>
 </head>
 
-<body>
+<body class="">
     <!-- Floating Navbar -->
     <nav id="navbar" class="relative z-10 top-0 left-0 right-0 bg-white text-black z-50 drop-shadow-xl h-full">
         <div class="container mx-auto flex items-center">
@@ -142,44 +144,110 @@
 
             <!-- Hamburger Menu -->
             <div class="flex-1 text-right">
-                <button class="absolute right-0 top-1/2 -translate-y-1/2 h-[64px] p-4 bg-white transition-colors duration-300" aria-label="Toggle Navigation Menu"aria-expanded="false" onclick="toggleNavMenu()">
-                <svg class="w-8 h-8 transition-colors duration-300" viewBox="0 0 403.49 403.49" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                  <g id="hamburger-menu-icon">
-                    <rect width="403.49" height="80.7" />
-                    <rect y="161.4" width="403.49" height="80.69" />
-                    <rect y="322.79" width="403.49" height="80.7" />
-                  </g>
-                </svg>
-              </button>
+                <button class="absolute right-0 top-1/2 -translate-y-1/2 h-[64px] p-4 bg-white transition-colors duration-300" aria-label="Toggle Navigation Menu" aria-expanded="false" onclick="toggleNavMenu()">
+                    <svg class="w-8 h-8 transition-colors duration-300" viewBox="0 0 403.49 403.49" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                        <g id="hamburger-menu-icon">
+                            <rect width="403.49" height="80.7" />
+                            <rect y="161.4" width="403.49" height="80.69" />
+                            <rect y="322.79" width="403.49" height="80.7" />
+                        </g>
+                    </svg>
+                </button>
             </div>
         </div>
 
         <!-- Dropdown Menu -->
-        <div id="dropdown-menu" class="absolute hidden flex-row w-full h-3/5 text-white items-center">
-            <div class="flex py-60 bg-black">
-                <div id="dpdm-left" class="flex flex-col w-[30%] h-full justify-center items-center">
-                    <button class="hover:text-red-500">
-                        <img src="img/carousel-left.svg" id="dpdm-left-uparrow" class="hover:fill-red-500">
-                    </button>
-                    <h2 class="text-[40px] font-bold py-8" id="dpdm-left-date">MAYU 2024年 1月号</h2>
-                    <button>
-                        <img src="img/carousel-left.svg" id="dpdm-left-downarrow" class="transform rotate-180">
-                    </button>
-                </div>
-                <div id="dpdm-right" class=" w-[70%] h-full bg-blue-400">
-                    <ul>
-                        <li id="no1" class="m-4 group">
-                            <a href="#" class="flex flex-col" >
-                                <div class="inline-block">
-                                    <span class="text-[20px] bg-black text-white group-hover:bg-white group-hover:text-[#003BFF] w-fit p-1">No. 1</span>
+        <div id="dropdown-menu" class="absolute w-full bg-black opacity-0 invisible transition-all duration-300 ease-in-out pointer-events-none [&.active]:pointer-events-auto [&.active]:opacity-100 [&.active]:visible hidden">
+            <div class="max-h-[calc(100vh-64px)] mx-auto overflow-y-auto">
+                <div class="min-h-[calc(100vh-64px)] flex items-center">
+                    <div class="w-[432px] px-16 text-white flex items-center justify-center">
+                        <div class="text-center">
+                            <button id="dpdm-left-uparrow" class="flex items-center justify-center w-[40px] h-[40px] mx-auto mb-16 transition-transform hover:scale-110">
+                                <span class="text-[48px] leading-none text-white">△</span>
+                            </button>
+                            <div class="inline-flex whitespace-nowrap group transition-colors hover:bg-white">
+                                <span class="text-[40px] font-dotgothic16 transition-colors group-hover:text-[#003BFF]">MAYU</span>
+                                <span class="text-[40px] font-dotgothic16 ml-4 transition-colors group-hover:text-[#003BFF]">2024年</span>
+                                <span class="text-[40px] font-dotgothic16 ml-4 transition-colors group-hover:text-[#003BFF]">1月号</span>
+                            </div>
+                            <button id="dpdm-left-darrow" class="flex items-center justify-center w-[40px] h-[40px] mx-auto mt-16 transition-transform hover:scale-110">
+                                <span class="text-[48px] leading-none text-white">▽</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-h-[calc(100vh-64px)] bg-white bg-[url('/images/worn-dots.png')] bg-repeat bg-auto relative">
+                        <div class="absolute inset-0 transition-opacity duration-300">
+                            <div class="absolute inset-0 opacity-0 transition-opacity duration-300 bg-cover bg-center bg-no-repeat [&.active]:opacity-100" data-article="1" style="background-image: url('/img/menu-visual/menu_article_01.jpg');"></div>
+                            <div class="absolute inset-0 opacity-0 transition-opacity duration-300 bg-cover bg-center bg-no-repeat [&.active]:opacity-100" data-article="2" style="background-image: url('/img/menu-visual/menu_article_02.jpg');"></div>
+                            <div class="absolute inset-0 opacity-0 transition-opacity duration-300 bg-cover bg-center bg-no-repeat [&.active]:opacity-100" data-article="3" style="background-image: url('/img/menu-visual/menu_article_03.jpg');"></div>
+                            <div class="absolute inset-0 opacity-0 transition-opacity duration-300 bg-cover bg-center bg-no-repeat [&.active]:opacity-100" data-article="4" style="background-image: url('/img/menu-visual/menu_article_04.jpg');"></div>
+                            <div class="absolute inset-0 opacity-0 transition-opacity duration-300 bg-cover bg-center bg-no-repeat [&.active]:opacity-100 active" data-article="5" style="background-image: url('/img/menu-visual/menu_article_05.jpg');"></div>
+                        </div>
+                        <div class="py-12 px-8 relative z-10 h-[600px]">
+                            <div class="articles-wrapper relative">
+                                <div class="article-item absolute w-full transition-all duration-300" style="top: 0" data-article="1">
+                                    <a href="/neo-retro.html" class="inline-block group cursor-pointer transition-all duration-300" data-article-page="neo-retro" data-hover-trigger="1">
+                                        <p class="text-[20px] mb-4">
+                                            <span class="bg-black text-white inline-block px-2 transition-colors group-hover:bg-white group-hover:text-[#003BFF]">No.
+                                                1
+                                            </span>
+                                            </p>
+                                        <h3 class="text-[32px] font-dotgothic16 text-white bg-black inline-block transition-colors group-hover:bg-white group-hover:text-[#003BFF]">
+                                            新[ネオ]レトロ再燃！新宿、今こそ喫茶でしょ。
+                                        </h3>
+                                    </a>
                                 </div>
-                                <div class="inline-block mt-2">
-                                    <h1 class="text-[32px] bg-black text-white font-400 group-hover:bg-white group-hover:text-[#003BFF] w-fit p-1">新(ネオ)レトロ再燃！ 新宿、今こそ喫茶でしょ。</h1>
+                                <div class="article-item absolute w-full transition-all duration-300" style="top: 168px" data-article="2">
+                                    <a href="/shin-okubo.html" class="inline-block group cursor-pointer transition-all duration-300" data-article-page="shin-okubo" data-hover-trigger="2">
+                                        <p class="text-[20px] mb-4">
+                                            <span class="bg-black text-white inline-block px-2 transition-colors group-hover:bg-white group-hover:text-[#003BFF]">No.
+                                                2
+                                            </span>
+                                        </p>
+                                        <h3 class="text-[32px] font-dotgothic16 text-white bg-black inline-block transition-colors group-hover:bg-white group-hover:text-[#003BFF]">
+                                            はじまりのコリアンタウン
+                                        </h3>
+                                    </a>
                                 </div>
-                                <!-- <span class="gap-1"></span> -->
-                            </a>
-                        </li>
-                    </ul>
+                                <div class="article-item absolute w-full transition-all duration-300" style="top: 336px" data-article="3">
+                                    <a href="/chi-tei.html" class="inline-block group cursor-pointer" data-hover-trigger="3">
+                                        <p class="text-[20px] mb-4">
+                                            <span class="bg-black text-white inline-block px-2 transition-colors group-hover:bg-white group-hover:text-[#003BFF]">No.
+                                                3
+                                            </span>
+                                        </p>
+                                        <h3 class="text-[32px] font-dotgothic16 text-white bg-black inline-block transition-colors group-hover:bg-white group-hover:text-[#003BFF]">
+                                            新宿駅に"地底人"!? 
+                                        </h3>
+                                    </a>
+                                </div>
+                                <div class="article-item absolute w-full transition-all duration-300" style="top: 504px" data-article="4">
+                                    <a href="/uju-mura.html" class="inline-block group cursor-pointer" data-hover-trigger="4">
+                                        <p class="text-[20px] mb-4">
+                                            <span class="bg-black text-white inline-block px-2 transition-colors group-hover:bg-white group-hover:text-[#003BFF]">No.
+                                                4
+                                            </span>
+                                        </p>
+                                        <h3 class="text-[32px] font-dotgothic16 text-white bg-black inline-block transition-colors group-hover:bg-white group-hover:text-[#003BFF]">
+                                            コズミックパワー全！！<\宙村>の神秘
+                                        </h3>
+                                    </a>
+                                </div>
+                                <div class="article-item absolute w-full transition-all duration-300" style="top: 504px" data-article="5">
+                                    <a href="/takano-baba.html" class="inline-block group cursor-pointer transition-all duration-300" data-article-page="takano-baba" data-hover-trigger="5">
+                                        <p class="text-[20px] mb-4">
+                                            <span class="bg-white text-[#003BFF] inline-block px-2 transition-colors group-hover:bg-white group-hover:text-[#003BFF]">No.
+                                                5
+                                            </span>
+                                        </p>
+                                        <h3 class="text-[32px] font-dotgothic16 bg-white text-[#003BFF] inline-block transition-colors group-hover:bg-white group-hover:text-[#003BFF]">
+                                            高田馬場って何だ！？新宿の学園都市に潜入
+                                        </h3>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -199,7 +267,9 @@
         <!-- Game view section -->
         <div id="game-view" class="relative z-0 pointer-events-auto w-full bg-blue h-[90%] relative">
 
-            <button id="toggle-survival" class="absolute bottom-4 right-4 p-2 bg-[#00FF95] rounded-full shadow-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 opacity-50" onclick="toggleSurvivalMode()">
+            <button id="toggle-survival"
+                class="absolute bottom-4 right-4 p-2 bg-[#00FF95] rounded-full shadow-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 opacity-50"
+                onclick="toggleSurvivalMode()">
                 <img src="img/sprites/survival_mode.svg" class="h-8" alt="Survival Mode" />
             </button>
             <!-- Game info panel -->
@@ -207,7 +277,8 @@
 
             </div>
             <!-- Inventory -->
-            <div class="inventory absolute bottom-2.5 left-2.5 bg-black bg-opacity-70 text-white p-2.5 font-sans text-sm rounded-lg hidden" id="inventory">
+            <div class="inventory absolute bottom-2.5 left-2.5 bg-black bg-opacity-70 text-white p-2.5 font-sans text-sm rounded-lg hidden"
+                id="inventory">
                 <strong>Inventory:</strong>
                 <ul id="inventory-list" class="list-none m-0 p-0"></ul>
             </div>
@@ -240,7 +311,8 @@
                             <div id="directions" class="text-sm">
                                 <h2 class="font-bold bg-[#003BFF] text-white inline-block p-1">やり方</h2>
                                 <p>高田馬場を探索し、さらに詳しく知る！</p>
-                                <p>チャレンジしてみませんか？右下の<span class="bg-[#FF2F00] text-white font-bold">「サバイバルモード」</span>をオンにして！</p>
+                                <p>チャレンジしてみませんか？右下の<span
+                                        class="bg-[#FF2F00] text-white font-bold">「サバイバルモード」</span>をオンにして！</p>
                             </div>
                             <div class="flex space-x-2" id="buff-icons">
                             </div>
@@ -268,7 +340,7 @@
                     <li>[ Space ] 使用・打つ</li>
                     <li>[ I ] Inventory</li>
                      add more instructions later... should it always be visible? -->
-                <!-- </ul>
+            <!-- </ul>
                 <strong>Directions:</strong>
                 <ul id="inventory-list">
                     <li>地図を探検して、ランドマークで高田馬場についてもっと知ろう</li>
@@ -278,15 +350,19 @@
             </div> -->
 
             <!-- Infobox -->
-            <div id="infobox-modal" class="modal absolute inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-30" id="landmark-modal">
+            <div id="infobox-modal"
+                class="modal absolute inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-30"
+                id="landmark-modal">
                 <div id="infobox-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
-                    <div id="infobox-header" class="modal-header flex bg-[#003BFF] text-[#E5FF00] text-4xl font-bold items-center justify-between h-16">
+                    <div id="infobox-header"
+                        class="modal-header flex bg-[#003BFF] text-[#E5FF00] text-4xl font-bold items-center justify-between h-16">
                         <!-- Title -->
                         <div class="flex-1 flex items-center">
                             <h1 id="infobox-title" class="p-2"></h1>
                         </div>
                         <!-- Close Button -->
-                        <div id="infobox-actions" class="aspect-square h-full bg-[#E5FF00] flex items-center justify-center cursor-pointer">
+                        <div id="infobox-actions"
+                            class="aspect-square h-full bg-[#E5FF00] flex items-center justify-center cursor-pointer">
                             <button id="infobox-close" class="text-[#003BFF] text-5xl font-bold">&times;</button>
                         </div>
                     </div>
@@ -335,8 +411,10 @@
                             <h1 id="gameover-title" class="p-2">GAME OVER</h1>
                         </div>
                         <!-- Close Button -->
-                        <div id="gameover-actions" class="aspect-square h-full bg-red-400 flex items-center justify-center cursor-pointer">
-                            <button id="gameover-close" class="text-black text-5xl font-bold" onclick="document.getElementById('gameover-modal').style.display = 'none'">&times;</button>
+                        <div id="gameover-actions"
+                            class="aspect-square h-full bg-red-400 flex items-center justify-center cursor-pointer">
+                            <button id="gameover-close" class="text-black text-5xl font-bold"
+                                onclick="document.getElementById('gameover-modal').style.display = 'none'">&times;</button>
                         </div>
                     </div>
                     <!-- Content -->
@@ -352,11 +430,12 @@
                                 <li>訪ねたランドマーク数: <span id="player-landmarks_visited"></span></li>
                                 <li>回復量: <span id="player-healed"></span></li>
                             </ul>
-                            <h2 id="player-total_score" class="text-4xl pt-2"></h2>
+                            <!-- <hr /> -->
+                            <h2 id="player-total_score" class="text-6xl pt-2"></h2>
                         </div>
                         <div id="gameover-body-text" class="flex-1 p-[32px] text-4xl">
                             <h3 class="pb-2">残念。。。</h3>
-                            <p class="text-xl">TIP: 「サバイバルモード」を有効にするのは、ランドマークを見終わった時だけにする方が良いです！（それでもスコアにカウントされます）</p>
+                            <p class="text-xs">TIP: 「サバイバルモード」を有効にするのは、ランドマークを見終わった時だけにする方が良いです！（それでもスコアにカウントされます）</p>
                         </div>
                     </div>
                 </div>
@@ -364,8 +443,11 @@
         </div>
         <!-- Article -->
         <div id="articles max-h-full">
-            <div id="article-expander" class="flex h-1/8 bg-[#003BFF] p-[16px] align-center justify-center cursor-pointer text-white" onclick="toggleArticle()">
-                <h3><span id="article-expander-rightarr">&rarr;</span> 代わりに全体の記事を表示されます <span id="article-expander-leftarr">&larr;</span></h3>
+            <div id="article-expander"
+                class="flex h-1/8 bg-[#003BFF] p-[16px] align-center justify-center cursor-pointer text-white"
+                onclick="toggleArticle()">
+                <h3><span id="article-expander-rightarr">&rarr;</span> 代わりに全体の記事を表示されます <span
+                        id="article-expander-leftarr">&larr;</span></h3>
             </div>
             <!-- when article-expander is clicked, #article expands to reveal the text that is in the game, so people who dont want to play can read instead -->
             <div id="article" class="py-24 px-96 hidden">
@@ -380,44 +462,64 @@
                     <div id="article-landmark-rotary" class="py-8">
                         <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">ロータリー</h2>
                         <img class="py-4" src="img/article_assets/rotary_2.jpg">
-                        <p class="pt-4">こっちはタバコを吸ったり、お酒を飲んだりする場所ですよ。「ここは喫煙禁止」と書かれた掲示が見える？ここの人たちはそれを提案として受け止めているんだ。マジでクレイジーでしょ？！ロータリーはいつも人間で賑わっているから、たまには遊びにおいでよね！</p>
-                        <p class="pt-4">このエリアは飲んだ後に友達たちとたむろするのに最適な場所だ！特に居酒屋でビールを一杯飲んだ後は、夜風がとても爽やかだ！しかし、エンターテインメントはそれだけではありまーーーーーーせん！たまにネズミを見ることもできる。まるで動物園だ！（警告：ネズミを撫でないでください。）</p>
+                        <p class="pt-4">
+                            こっちはタバコを吸ったり、お酒を飲んだりする場所ですよ。「ここは喫煙禁止」と書かれた掲示が見える？ここの人たちはそれを提案として受け止めているんだ。マジでクレイジーでしょ？！ロータリーはいつも人間で賑わっているから、たまには遊びにおいでよね！
+                        </p>
+                        <p class="pt-4">
+                            このエリアは飲んだ後に友達たちとたむろするのに最適な場所だ！特に居酒屋でビールを一杯飲んだ後は、夜風がとても爽やかだ！しかし、エンターテインメントはそれだけではありまーーーーーーせん！たまにネズミを見ることもできる。まるで動物園だ！（警告：ネズミを撫でないでください。）
+                        </p>
                     </div>
                     <div id="article-landmark-sakae" class="py-8">
                         <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">さかえ通り</h2>
                         <img class="py-4" src="img/article_assets/sakae_1.jpg" />
-                        <p class="pt-4">この道には居酒屋、レストラン、屋台、バー、クラブが一杯あるよ！この狭い通りにどれだけの人がいるかわかる？それがこの地域がいかに活気に満ちているかを物語っている。絶対に退屈しない！あ、見てくれ！動物園のネズミが戻ってきた！(厳重警告：ネズミを撫でないでください）</p>
+                        <p class="pt-4">
+                            この道には居酒屋、レストラン、屋台、バー、クラブが一杯あるよ！この狭い通りにどれだけの人がいるかわかる？それがこの地域がいかに活気に満ちているかを物語っている。絶対に退屈しない！あ、見てくれ！動物園のネズミが戻ってきた！(厳重警告：ネズミを撫でないでください）
+                        </p>
                     </div>
                     <div id="article-landmark-bigbox" class="py-8">
                         <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">Big Box</h2>
                         <img class="py-4" src="img/article_assets/bigbox.jpg" />
-                        <p class="pt-4">高田馬場のランドマーク、Big Box！中にはお店、レストラン、フィットネスクラブ、ゲームセンターまでたっぷりあるよ！なんてこった！窓はどこ！？そうですね：Big Boxには窓がない。だから、基本的に時間を知ることは不可能です！深夜だとわかるのは、追い出されたときだけだ。結構楽しいよ！僕と友達はここで数え切れないほどの時間を過ごした。懐かしい思い出だ。ほとんどが強制送還されてしまったのが残念だ。</p>
+                        <p class="pt-4">高田馬場のランドマーク、Big
+                            Box！中にはお店、レストラン、フィットネスクラブ、ゲームセンターまでたっぷりあるよ！なんてこった！窓はどこ！？そうですね：Big
+                            Boxには窓がない。だから、基本的に時間を知ることは不可能です！深夜だとわかるのは、追い出されたときだけだ。結構楽しいよ！僕と友達はここで数え切れないほどの時間を過ごした。懐かしい思い出だ。ほとんどが強制送還されてしまったのが残念だ。
+                        </p>
                     </div>
                     <div id="article-landmark-mural" class="py-8">
                         <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">手塚の壁画</h2>
                         <img class="py-4" src="img/article_assets/mural.jpg" />
-                        <p class="pt-4">あっ、鉄腕アトムがいる。何でここにいるんだろう？まあ、ここで生まれたからだよ！そうです！世界的な漫画家、手塚治虫様がこの高田馬場で鉄腕アトムを生み出したのだ！手塚治虫様は大阪で生まれだけど、ほぼ一生を高田馬場で過ごしたんだ。だから、手塚様が亡くなったとき、生涯を記念する壁画が作られた。この壁画には、彼の他の作品も祀られている。</p>
+                        <p class="pt-4">
+                            あっ、鉄腕アトムがいる。何でここにいるんだろう？まあ、ここで生まれたからだよ！そうです！世界的な漫画家、手塚治虫様がこの高田馬場で鉄腕アトムを生み出したのだ！手塚治虫様は大阪で生まれだけど、ほぼ一生を高田馬場で過ごしたんだ。だから、手塚様が亡くなったとき、生涯を記念する壁画が作られた。この壁画には、彼の他の作品も祀られている。
+                        </p>
                     </div>
                     <div id="article-landmark-street" class="py-8">
                         <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">不明通り</h2>
                         <img class="py-4" src="img/article_assets/unnamed_street.jpg" />
-                        <p class="pt-4">この通りが見えますか？高田馬場で日本語学校に通っていた頃、毎日のように通った道だ。いい思い出がたくさんあります。この白いパーカーを着ている男がいるでしょ？高田馬場で出会った親友だ。</p>
+                        <p class="pt-4">
+                            この通りが見えますか？高田馬場で日本語学校に通っていた頃、毎日のように通った道だ。いい思い出がたくさんあります。この白いパーカーを着ている男がいるでしょ？高田馬場で出会った親友だ。
+                        </p>
                     </div>
                     <div id="article-landmark-vendingmachine" class="py-8">
                         <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">秘密の自販機</h2>
                         <img class="py-4" src="img/article_assets/jihanki_1.jpg" />
-                        <p class="pt-4">もし1000円あったら、この秘密の自販機を見つけに来てね！本当に不思議な自販機です。何が出てくるかはランダムだけど、多分めっちゃくちゃカッコイイよ！ほら、あの変人も懐中電灯を手に入れたよ！どこにあるかは教えませんけどｗｗｗｗ。高田馬場を探検しに来てね！</p>
+                        <p class="pt-4">
+                            もし1000円あったら、この秘密の自販機を見つけに来てね！本当に不思議な自販機です。何が出てくるかはランダムだけど、多分めっちゃくちゃカッコイイよ！ほら、あの変人も懐中電灯を手に入れたよ！どこにあるかは教えませんけどｗｗｗｗ。高田馬場を探検しに来てね！
+                        </p>
                     </div>
                     <div id="article-landmark-top3" class="py-8">
-                        <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">公衆の面前で飲酒するスポットTOP3紹介</h2>
+                        <h2 class="inline-block px-2 text-4xl font-normal py-4 bg-[#003BFF] text-white">
+                            公衆の面前で飲酒するスポットTOP3紹介</h2>
                         <!-- <img src="img/article_assets/DSC03503.JPG" /> -->
                         <p class="pt-4">皆さんお待ちかねの最終章は、俺が選ぶ公共の場で飲めるスポットTOP3だ！</p>
-                        <p class="pt-4">さて、人前で飲むといえば、アルコール飲料のことだ。ポカリスエットのことだと思った？NO！強い酒のことだ。好きな場所で飲めるのなら、なおさらだ！というわけで、人前でお酒が飲める場所ベスト3を紹介しよう：</p>
+                        <p class="pt-4">
+                            さて、人前で飲むといえば、アルコール飲料のことだ。ポカリスエットのことだと思った？NO！強い酒のことだ。好きな場所で飲めるのなら、なおさらだ！というわけで、人前でお酒が飲める場所ベスト3を紹介しよう：
+                        </p>
                         <ul>
                             <li class="py-8">
                                 <h3 class="text-2xl bg-[#CD7F32] px-2 py-2">3位：ロータリー</h3>
                                 <img class="py-2" src="img/article_assets/rotary.jpg" />
-                                <p class="pt-4">これは逃げの答えのようだが、ここは飲むには本当に楽しい場所だ！近くで飲んでいる人たちがいて、活気ある雰囲気が、より一層活力を与えてくれる！友達がいないから一人で飲む？それもいいよ！一人で飲んでいれば、そのうち誰かが誘ってくれる！普通の社交文化とは全く逆でしょう？</p>
+                                <p class="pt-4">
+                                    これは逃げの答えのようだが、ここは飲むには本当に楽しい場所だ！近くで飲んでいる人たちがいて、活気ある雰囲気が、より一層活力を与えてくれる！友達がいないから一人で飲む？それもいいよ！一人で飲んでいれば、そのうち誰かが誘ってくれる！普通の社交文化とは全く逆でしょう？
+                                </p>
                             </li>
                             <li class="py-8">
                                 <h3 class="text-2xl bg-[#C0C0C0] px-2 py-2">2位：さかえ通り</h3>
@@ -427,7 +529,9 @@
                             <li class="py-8">
                                 <h3 class="text-2xl bg-[#FFD700] px-2 py-2 font-bold">1位：この道</h3>
                                 <img class="py-2" src="img/article_assets/drinking_spot1.jpg" />
-                                <p class="pt-4">超真面目に言うけど、高田馬場で一番飲める場所だよ。友達を何人か誘って、コンビニで飲み物（もちろんお酒）をたくさん買って、この通りの脇をぶらぶらしながら飲んでください。この通りをさらに奥に進むと神田川があり、そこで他の人たちも飲んでいる可能性が高い！</p>
+                                <p class="pt-4">
+                                    超真面目に言うけど、高田馬場で一番飲める場所だよ。友達を何人か誘って、コンビニで飲み物（もちろんお酒）をたくさん買って、この通りの脇をぶらぶらしながら飲んでください。この通りをさらに奥に進むと神田川があり、そこで他の人たちも飲んでいる可能性が高い！
+                                </p>
                                 <p class="pt-4">賑やかな街の片隅で、仲間と酒を酌み交わしながら、ただぶらぶらすることは最高だよ。</p>
                             </li>
                         </ul>
@@ -500,11 +604,120 @@
         //     // document.addEventListener('contextmenu', event => event.preventDefault());
         // })
 
+        // function toggleNavMenu() {
+        //     const dropdownMenu = document.getElementById('dropdown-menu');
+        //     dropdownMenu.classList.toggle('active');
+        //     dropdownMenu.classList.toggle('hidden');
+        // }
+
+        // DOM Elements
+        const menuButton = document.querySelector('[aria-label="Toggle Navigation Menu"]');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        const dpdm_left_uparrow = document.getElementById('dpdm-left-uparrow');
+        const dpdm_left_downarrow = document.getElementById('dpdm-left-darrow');
+        const articles = document.querySelectorAll('.article-item');
+        const hoverTriggers = document.querySelectorAll('[data-hover-trigger]');
+        const yearDisplay = document.querySelector('.font-dotgothic16:nth-child(2)');
+        const monthDisplay = document.querySelector('.font-dotgothic16:nth-child(3)');
+
+        // State Variables
+        let currentYear = 2024;
+        let currentMonth = 1;
+        let currentArticleSet = 1; // 1 for articles 1-4, 2 for article 5
+
+        // Constants
+        const ARTICLE_SPACING = 168;
+
+        // Function: Toggle Dropdown Menu
         function toggleNavMenu() {
-            const dropdownMenu = document.getElementById('dropdown-menu');
-            dropdownMenu.classList.toggle('active');
-            dropdownMenu.classList.toggle('hidden');
+        dropdownMenu.classList.toggle('active');
+        dropdownMenu.classList.toggle('hidden');
         }
+
+        // Function: Update Article Positions
+        function updateArticlePositions(showingArticle5) {
+            articles.forEach((article) => {
+                const articleNumber = parseInt(article.dataset.article, 10);
+
+                if (showingArticle5) {
+                if (articleNumber === 1) {
+                    article.style.top = `-${ARTICLE_SPACING}px`;
+                    article.style.opacity = '0';
+                    article.style.pointerEvents = 'none';
+                } else if (articleNumber === 5) {
+                    article.style.top = `${504}px`;
+                    article.classList.remove('hidden');
+                    requestAnimationFrame(() => {
+                    article.style.opacity = '1';
+                    article.style.pointerEvents = 'auto';
+                    });
+                } else {
+                    const newPosition = (articleNumber - 2) * ARTICLE_SPACING;
+                    article.style.top = `${newPosition}px`;
+                }
+                } else {
+                if (articleNumber === 1) {
+                    article.style.top = '0';
+                    article.style.opacity = '1';
+                    article.style.pointerEvents = 'auto';
+                } else if (articleNumber === 5) {
+                    article.style.opacity = '0';
+                    article.style.pointerEvents = 'none';
+                    setTimeout(() => article.classList.add('hidden'), 300);
+                } else {
+                    const newPosition = (articleNumber - 1) * ARTICLE_SPACING;
+                    article.style.top = `${newPosition}px`;
+                }
+                }
+            });
+        }
+
+        // Function: Update Month Display
+        function updateMonthDisplay() {
+            if (yearDisplay && monthDisplay) {
+                yearDisplay.textContent = `${currentYear}年`;
+                monthDisplay.textContent = `${currentMonth}月号`;
+            }
+        }
+
+        // Event: Menu Button Click
+        // menuButton?.addEventListener('click', toggleNavMenu);
+
+        // Event: Navigate Months with Arrows
+        dpdm_left_uparrow?.addEventListener('click', () => {
+            if (currentMonth === 1) {
+                currentMonth = 12;
+                currentYear--;
+            } else {
+                currentMonth--;
+            }
+            updateMonthDisplay();
+        });
+
+        dpdm_left_downarrow?.addEventListener('click', () => {
+            if (currentMonth === 12) {
+                currentMonth = 1;
+                currentYear++;
+            } else {
+                currentMonth++;
+            }
+            updateMonthDisplay();
+        });
+
+        // Event: Hover Effects for Background
+        hoverTriggers.forEach(trigger => {
+            trigger.addEventListener('mouseenter', () => {
+                const articleId = trigger.dataset.hoverTrigger;
+                articles.forEach(bg => bg.classList.remove('active'));
+                document.querySelector(`[data-article="${articleId}"]`)?.classList.add('active');
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateArticlePositions(true);
+            updateMonthDisplay();
+        });
 
         function toggleArticle() {
             var article = document.getElementById('article');
@@ -520,29 +733,29 @@
                 article.classList.add('hidden');
             }
         }
-        window.addEventListener('keydown', function(e) {
-            if(e.keyCode == 32 && e.target == document.getElementById('game-view')) {
+        window.addEventListener('keydown', function (e) {
+            if (e.keyCode == 32 && e.target == document.getElementById('game-view')) {
                 e.preventDefault();
             }
         });
 
         // dropdown functionality
-        function set_dropdown_date() {
-            var date = new Date();
-            var month = date.toLocaleString('default', { month: 'long' });
-            var year = date.getFullYear();
-            document.getElementById('dpdm-left-date').innerText = `MAYU ${year}年 ${month}号`;
-        }
-        
-        $('#no1').hover(function() {
-            $('dpdm-right').background = 'img/article_assets/retro.jpg';
-            console.log('changing background [no1]');
-        }, function() {
-            $('dpdm-right').background = '';
-            console.log('resetting background to original');
-        });
+        // function set_dropdown_date() {
+        //     var date = new Date();
+        //     var month = date.toLocaleString('default', { month: 'long' });
+        //     var year = date.getFullYear();
+        //     document.getElementById('dpdm-left-date').innerText = `MAYU ${year}年 ${month}号`;
+        // }
 
-        
+        // $('#no1').hover(function () {
+        //     $('dpdm-right').background = 'img/article_assets/retro.jpg';
+        //     console.log('changing background [no1]');
+        // }, function () {
+        //     $('dpdm-right').background = '';
+        //     console.log('resetting background to original');
+        // });
+
+
     </script>
     <!-- <script type="text/javascript" src="js/TakadanobabaFighter.js"></script> -->
 </body>
