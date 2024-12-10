@@ -385,6 +385,7 @@ const textures = {
 const background = new PIXI.Sprite(textures.background, window.innerWidth, window.innerHeight);
 background.position.set(0, 0);
 app.stage.addChild(background);
+// document.querySelector('canvas').style.zIndex = '1';
 // app.stage.sortableChildren = true;
 
 // load player sprite and add to stage

@@ -9,16 +9,14 @@
     <script src="js/pixi-gif.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/TakadanobabaFighter.js" defer></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
         body {
             margin: 0;
             overflow: hidden;
-        }
-
-        canvas {
-            display: block;
         }
 
         h1,
@@ -75,10 +73,25 @@
             }
         }
 
+        #game-view {
+            position: relative;
+            /* z-index: -1; */
+            z-index: 0;
+            pointer-events: auto;
+        }
+
         #dropdown-menu {
             transition: transform 0.3s ease, opacity 0.3s ease;
             transform: translateY(-10px);
             opacity: 0;
+            z-index: 100;
+            position: absolute;
+            #dpdm-left {
+                button:hover {
+                    cursor: pointer;
+                    color: red;
+                }
+            }
         }
 
         #dropdown-menu.active {
@@ -117,13 +130,13 @@
 
 <body>
     <!-- Floating Navbar -->
-    <nav class=" top-0 left-0 right-0 bg-white text-black p-4 z-50 drop-shadow-xl h-full">
+    <nav id="navbar" class="relative z-10 top-0 left-0 right-0 bg-white text-black z-50 drop-shadow-xl h-full">
         <div class="container mx-auto flex items-center">
             <!-- Empty Div to Align the Center Content -->
             <div class="flex-1"></div>
 
             <!-- Centered SVG -->
-            <div class="flex-none text-center">
+            <div class="flex-none text-center p-4">
                 <img src="img/mayu.svg" class="inline-block h-8" alt="Logo" />
             </div>
 
@@ -131,7 +144,7 @@
             <div class="flex-1 text-right">
                 <button class="absolute right-0 top-1/2 -translate-y-1/2 h-[64px] p-4 bg-white transition-colors duration-300" aria-label="Toggle Navigation Menu"aria-expanded="false" onclick="toggleNavMenu()">
                 <svg class="w-8 h-8 transition-colors duration-300" viewBox="0 0 403.49 403.49" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                  <g>
+                  <g id="hamburger-menu-icon">
                     <rect width="403.49" height="80.7" />
                     <rect y="161.4" width="403.49" height="80.69" />
                     <rect y="322.79" width="403.49" height="80.7" />
@@ -142,15 +155,31 @@
         </div>
 
         <!-- Dropdown Menu -->
-        <div id="dropdown-menu" class="hidden absolute top-full left-0 right-0 bg-white shadow-lg z-100 h-full">
-            <div class="flex">
-                <div id="navbar-navigation" class="flex flex-row w-full h-full">
-                    <div id="monthly-nav" class="flex-1 h-full basis-[40%] justify-self-center self-center bg-black text-white">
-                        test
-                    </div>
-                    <div id="articles-nav" class="flex-1 basis-[60%]">
-                        test
-                    </div>
+        <div id="dropdown-menu" class="absolute hidden flex-row w-full h-3/5 text-white items-center">
+            <div class="flex py-60 bg-black">
+                <div id="dpdm-left" class="flex flex-col w-[30%] h-full justify-center items-center">
+                    <button class="hover:text-red-500">
+                        <img src="img/carousel-left.svg" id="dpdm-left-uparrow" class="hover:fill-red-500">
+                    </button>
+                    <h2 class="text-[40px] font-bold py-8" id="dpdm-left-date">MAYU 2024年 1月号</h2>
+                    <button>
+                        <img src="img/carousel-left.svg" id="dpdm-left-downarrow" class="transform rotate-180">
+                    </button>
+                </div>
+                <div id="dpdm-right" class=" w-[70%] h-full bg-blue-400">
+                    <ul>
+                        <li id="no1" class="m-4 group">
+                            <a href="#" class="flex flex-col" >
+                                <div class="inline-block">
+                                    <span class="text-[20px] bg-black text-white group-hover:bg-white group-hover:text-[#003BFF] w-fit p-1">No. 1</span>
+                                </div>
+                                <div class="inline-block mt-2">
+                                    <h1 class="text-[32px] bg-black text-white font-400 group-hover:bg-white group-hover:text-[#003BFF] w-fit p-1">新(ネオ)レトロ再燃！ 新宿、今こそ喫茶でしょ。</h1>
+                                </div>
+                                <!-- <span class="gap-1"></span> -->
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -168,7 +197,7 @@
             </div>
         </div>
         <!-- Game view section -->
-        <div id="game-view" class="w-full bg-blue h-[90%] relative">
+        <div id="game-view" class="relative z-0 pointer-events-auto w-full bg-blue h-[90%] relative">
 
             <button id="toggle-survival" class="absolute bottom-4 right-4 p-2 bg-[#00FF95] rounded-full shadow-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 opacity-50" onclick="toggleSurvivalMode()">
                 <img src="img/sprites/survival_mode.svg" class="h-8" alt="Survival Mode" />
@@ -249,19 +278,15 @@
             </div> -->
 
             <!-- Infobox -->
-            <div id="infobox-modal"
-                class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-10"
-                id="landmark-modal">
+            <div id="infobox-modal" class="modal absolute inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-30" id="landmark-modal">
                 <div id="infobox-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
-                    <div id="infobox-header"
-                        class="modal-header flex bg-[#003BFF] text-[#E5FF00] text-4xl font-bold items-center justify-between h-16">
+                    <div id="infobox-header" class="modal-header flex bg-[#003BFF] text-[#E5FF00] text-4xl font-bold items-center justify-between h-16">
                         <!-- Title -->
                         <div class="flex-1 flex items-center">
                             <h1 id="infobox-title" class="p-2"></h1>
                         </div>
                         <!-- Close Button -->
-                        <div id="infobox-actions"
-                            class="aspect-square h-full bg-[#E5FF00] flex items-center justify-center cursor-pointer">
+                        <div id="infobox-actions" class="aspect-square h-full bg-[#E5FF00] flex items-center justify-center cursor-pointer">
                             <button id="infobox-close" class="text-[#003BFF] text-5xl font-bold">&times;</button>
                         </div>
                     </div>
@@ -277,7 +302,7 @@
             </div>
             <!-- Minimap -->
             <div id="minimap"
-                class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 pt-10">
+                class="modal absolute inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 pt-10">
                 <div id="minimap-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
                     <div id="minimap-header"
                         class="modal-header flex bg-black text-green-400 text-4xl font-bold items-center justify-between h-16">
@@ -300,17 +325,17 @@
             </div>
             <!-- Game over screen -->
             <div id="gameover-modal"
-                class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-10"
+                class="modal absolute inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-10"
                 id="landmark-modal">
                 <div id="gameover-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
                     <div id="gameover-header"
-                        class="modal-header flex bg-black text-green-400 text-4xl font-bold items-center justify-between h-16">
+                        class="modal-header flex bg-black text-red-400 text-4xl font-bold items-center justify-between h-16">
                         <!-- Title -->
                         <div class="flex-1 flex items-center">
                             <h1 id="gameover-title" class="p-2">GAME OVER</h1>
                         </div>
                         <!-- Close Button -->
-                        <div id="gameover-actions" class="aspect-square h-full bg-[#00FF95] flex items-center justify-center cursor-pointer">
+                        <div id="gameover-actions" class="aspect-square h-full bg-red-400 flex items-center justify-center cursor-pointer">
                             <button id="gameover-close" class="text-black text-5xl font-bold" onclick="document.getElementById('gameover-modal').style.display = 'none'">&times;</button>
                         </div>
                     </div>
@@ -330,6 +355,8 @@
                             <h2 id="player-total_score" class="text-4xl pt-2"></h2>
                         </div>
                         <div id="gameover-body-text" class="flex-1 p-[32px] text-4xl">
+                            <h3 class="pb-2">残念。。。</h3>
+                            <p class="text-xl">TIP: 「サバイバルモード」を有効にするのは、ランドマークを見終わった時だけにする方が良いです！（それでもスコアにカウントされます）</p>
                         </div>
                     </div>
                 </div>
@@ -498,6 +525,24 @@
                 e.preventDefault();
             }
         });
+
+        // dropdown functionality
+        function set_dropdown_date() {
+            var date = new Date();
+            var month = date.toLocaleString('default', { month: 'long' });
+            var year = date.getFullYear();
+            document.getElementById('dpdm-left-date').innerText = `MAYU ${year}年 ${month}号`;
+        }
+        
+        $('#no1').hover(function() {
+            $('dpdm-right').background = 'img/article_assets/retro.jpg';
+            console.log('changing background [no1]');
+        }, function() {
+            $('dpdm-right').background = '';
+            console.log('resetting background to original');
+        });
+
+        
     </script>
     <!-- <script type="text/javascript" src="js/TakadanobabaFighter.js"></script> -->
 </body>
