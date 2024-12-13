@@ -30,6 +30,7 @@ const enemy_attack_range = 50;
 const modal_pushback_distance = 100;
 const modal_pushback_radius = 50;
 let survival_mode = false;
+let is_ticker_added = false;
 
 const max_survival_mode_toggle_enemies = 7;
 
@@ -390,6 +391,14 @@ app.stage.addChild(background);
 
 // load player sprite and add to stage
 function spawnPlayer() {
+    // if (!is_ticker_added) {
+    //     app.ticker.add(update);
+    //     is_ticker_added = true;
+    // }
+    if (player) {
+        // Destroy existing player sprite to avoid duplication
+        player.sprite.destroy();
+    }
 
     player = new Player();
     player.sprite.anchor.set(0.5);
@@ -399,14 +408,14 @@ function spawnPlayer() {
     player.sprite.x = app.screen.width / 2;
     player.sprite.y = app.screen.height / 2;
     player.sprite.zIndex = 3;
-    player.sprite.scale.set(4);
+    player.sprite.scale.set(1);
     app.stage.addChild(player.sprite);
     // return player;
 
     app.ticker.add(update);
 }
 
-spawnPlayer();
+// spawnPlayer();
 
 // player respawning
 function respawnPlayer() {
@@ -802,29 +811,29 @@ function update(delta) {
     if (survival_mode) {
         game_hud_div.innerHTML = `
         <div class="top-[5rem] bg-white text-black p-4 m-4 rounded-lg shadow-lg z-40 w-64">
-    <div class="flex items-center space-x-4">
-        <img src="img/sprites/player.svg" class="w-12 h-12 rounded-full border-2 border-black">
-        <div class="flex-1">
-            <div class="text-sm font-semibold">HP</div>
-            <div class="relative w-full h-4 bg-gray-500 rounded-full overflow-hidden">
-                <!-- Health bar fills the width dynamically -->
-                <div id="health-bar" 
-                     class="absolute top-0 left-0 h-full bg-red-600 rounded-full transition-all duration-300"
-                     style="width: 75%;"></div>
+            <div class="flex items-center space-x-4">
+                <img src="img/sprites/player.svg" class="w-12 h-12 rounded-full border-2 border-black">
+                <div class="flex-1">
+                    <div class="text-sm font-semibold">HP</div>
+                    <div class="relative w-full h-4 bg-gray-500 rounded-full overflow-hidden">
+                        <!-- Health bar fills the width dynamically -->
+                        <div id="health-bar" 
+                            class="absolute top-0 left-0 h-full bg-red-600 rounded-full transition-all duration-300"
+                            style="width: 75%;"></div>
+                    </div>
+                    <span class="text-sm text-gray-300" id="character-health">75 / 100</span>
+                </div>
             </div>
-            <span class="text-sm text-gray-300" id="character-health">75 / 100</span>
-        </div>
-    </div>
-    <div class="mt-4">
-        <div class="flex justify-between items-center">
-            <div class="text-sm">
-                <span class="font-semibold">存続時間:</span> <span id="elapsed-time">00:00</span>
+            <div class="mt-4">
+                <div class="flex justify-between items-center">
+                    <div class="text-sm">
+                        <span class="font-semibold">存続時間:</span> <span id="elapsed-time">00:00</span>
+                    </div>
+                    <div class="flex space-x-2" id="buff-icons">
+                    </div>
+                </div>
             </div>
-            <div class="flex space-x-2" id="buff-icons">
-            </div>
-        </div>
-    </div>
-</div>`;
+        </div>`;
         game_hud_div.classList.remove('hidden');
     } else {
         game_hud_div.innerHTML = '';
