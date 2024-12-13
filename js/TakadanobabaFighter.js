@@ -1101,6 +1101,7 @@ function gameOver() {
     let total_score = (player.statistics.damage_dealt - player.statistics.damage_taken + player.statistics.enemies_killed - player.statistics.healed);
     if (player.statistics.landmarks_visited >= 1) total_score *= player.statistics.landmarks_visited;
 
+    if (total_score < 0) total_score = 0;
     stat_total_score.textContent = total_score;
 
 }
