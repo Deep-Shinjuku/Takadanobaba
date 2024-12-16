@@ -1,9 +1,5 @@
 /*
 TODO: Add bounding limits to the map so the player doesn't go off screen
-TODO: Add attack and damage system for player and enemies
-TODO: Expand map size so it's not just a small portion
-TODO: Add more landmarks and enemies
-TODO: Add contextual texture changes and animations for player and enemies
 TODO: Disable object interaction after it's been interacted with
 */
 
@@ -735,7 +731,6 @@ const gameObjects = [
     // vending machines to dispense health to player
     // { x: 100, y: 100, type: 'vendingmachine', name: '自販機', info: '自販機', item: { name: 'Soda', type: 'heal', value: 10 }, sprite: null },
     // { x: 300, y: 200, type: 'vendingmachine', name: '自販機', info: '自販機', item: { name: 'Soda', type: 'heal', value: 10 }, sprite: null }
-
 ];
 
 // place landmarks on the map
@@ -747,7 +742,7 @@ gameObjects.forEach(obj => {
             landmark_texture.zIndex = 1;
             landmark_texture.x = obj.x + background.width / 2;
             landmark_texture.y = obj.y + background.height / 2;
-            // landmark_texture.width = 128; // TODO: make it not blurry as shit wtf
+            // landmark_texture.width = 128;
             // landmark_texture.height = 128;
             obj.sprite = landmark_texture;
             app.stage.addChild(landmark_texture);
@@ -866,14 +861,14 @@ function update(delta) {
         keys['KeyM'].handled = true;
     }
 
-    const newX = player.x + move.x;
-    const newY = player.y + move.y;
+    // const newX = player.x + move.x;
+    // const newY = player.y + move.y;
 
-    // background limits
-    const bgLeft = background.x;
-    const bgTop = background.y;
-    const bgRight = background.x + background.width;
-    const bgBottom = background.y + background.height;
+    // // background limits
+    // const bgLeft = background.x;
+    // const bgTop = background.y;
+    // const bgRight = background.x + background.width;
+    // const bgBottom = background.y + background.height;
 
     // move background (to simulate player movement)
     background.x += move.x;
