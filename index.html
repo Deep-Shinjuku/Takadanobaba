@@ -352,19 +352,15 @@
             </div> -->
 
             <!-- Infobox -->
-            <div id="infobox-modal"
-                class="modal absolute inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-30"
-                id="landmark-modal">
-                <div id="infobox-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative">
-                    <div id="infobox-header"
-                        class="modal-header flex bg-[#003BFF] text-[#E5FF00] text-4xl font-bold items-center justify-between h-16">
+            <div id="infobox-modal" class="modal absolute inset-0 bg-black bg-opacity-50 hidden items-start justify-center z-50 pt-30 overflow-y-auto h-full" id="landmark-modal">
+                <div id="infobox-content" class="modal-content bg-gray-100 pb-6 shadow-lg w-4/5 max-w-4xl relative m-30">
+                    <div id="infobox-header" class="modal-header flex bg-[#003BFF] text-[#E5FF00] text-4xl font-bold items-center justify-between h-16">
                         <!-- Title -->
                         <div class="flex-1 flex items-center">
                             <h1 id="infobox-title" class="p-2"></h1>
                         </div>
                         <!-- Close Button -->
-                        <div id="infobox-actions"
-                            class="aspect-square h-full bg-[#E5FF00] flex items-center justify-center cursor-pointer">
+                        <div id="infobox-actions" class="aspect-square h-full bg-[#E5FF00] flex items-center justify-center cursor-pointer">
                             <button id="infobox-close" class="text-[#003BFF] text-5xl font-bold">&times;</button>
                         </div>
                     </div>
