@@ -141,7 +141,9 @@
 
             <!-- Centered SVG -->
             <div class="flex-none text-center p-4">
-                <img src="img/mayu.svg" class="inline-block h-8" alt="Logo" />
+                <a href="./">
+                    <img src="img/mayu.svg" class="inline-block h-8" alt="Logo" />
+                </a>
             </div>
 
             <!-- Hamburger Menu -->
@@ -479,11 +481,8 @@
         </div>
         <!-- Article -->
         <div id="articles max-h-full">
-            <div id="article-expander"
-                class="flex h-1/8 bg-[#003BFF] p-[16px] align-center justify-center cursor-pointer text-white"
-                onclick="toggleArticle()">
-                <h3><span id="article-expander-rightarr">&rarr;</span> 代わりに全体の記事を表示されます <span
-                        id="article-expander-leftarr">&larr;</span></h3>
+            <div id="article-expander" class="flex h-1/8 bg-[#003BFF] p-[16px] align-center justify-center cursor-pointer text-white" onclick="toggleArticle()">
+                <h3 class="hover:animate-pulse"><span id="article-expander-rightarr">&rarr;</span> 代わりに全体の記事を表示されます <span id="article-expander-leftarr">&larr;</span></h3>
             </div>
             <!-- when article-expander is clicked, #article expands to reveal the text that is in the game, so people who dont want to play can read instead -->
             <div id="article" class="py-24 px-40 hidden">
@@ -595,39 +594,41 @@
                     <span class="text-[32px] font-bold ">1月号</span>
                     <ul>
                         <li class="py-[4px]">
-                            <a>
+                            <a href="./neo-retro.html" class="hover:text-[#FF2F00] hover:animate-pulse">
                                 <span>No.1 新(ネオ)レトロ再燃！ 新宿、今こそ喫茶でしょ。</span>
                             </a>
                         </li>
                         <li class="py-[4px]">
-                            <a>
+                            <a href="./shin-okubo.html" class="hover:text-[#FF2F00] hover:animate-pulse">
                                 <span>No.2 はじまりのコリアンタウン</span>
                             </a>
                         </li>
                         <li class="py-[4px]">
-                            <a>
+                            <a href="./chi-tei.html" class="hover:text-[#FF2F00] hover:animate-pulse">
                                 <span>No.3 新宿駅に”地底人”！？</span>
                             </a>
                         </li>
                         <li class="py-[4px]">
-                            <a>
+                            <a href="./uju-mura.html" class="hover:text-[#FF2F00] hover:animate-pulse">
                                 <span>No.4 コズミックパワー全開！！<宇宙村>の神秘</span>
                             </a>
                         </li>
                         <li class="py-[4px]">
-                            <a>
+                            <a href="takadanobaba.html" class="hover:text-[#FF2F00] hover:animate-pulse">
                                 <span>No.5 高田馬場って何だ！？新宿の学園都市に潜入</span>
                             </a>
                         </li>
                     </ul>
                     <hr class="pt-[8px]" />
                     <div class="text-right">
-                        <a href="#">バックナンバーを見る →</a>
+                        <a href="./" class="hover:text-[#FF2F00] hover:animate-pulse">バックナンバーを見る →</a>
                     </div>
                 </div>
             </div>
             <div id="footer-right" class="flex flex-col text-right">
-                <img src="img/mayu-white.svg" class="inline-block h-[106px]" alt="Logo" />
+                <a href="./">
+                    <img src="img/mayu-white.svg" class="inline-block h-[106px]" alt="Logo" />
+                </a>
                 <span class="text-[12px] font-medium">©2024 by MAYU-Editorial department, ltd.(Tokyo) </span>
             </div>
         </div>
